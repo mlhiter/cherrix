@@ -13,16 +13,31 @@ export const {
   signOut,
 } = NextAuth({
   ...authConfig,
-  callbacks: {
-    async signIn({ user }) {
-      if (!user.id) return false
-
-      const existingUser = await getUserById(user.id)
-
-      if (!existingUser || !existingUser.emailVerified) return false
-
-      return true
+  pages: {
+    signIn: '/auth/login',
+    error: '/auth/error',
+  },
+  events: {
+    async linkAccount({ user }) {
+      await db.user.update({
+        where: { id: user.id },
+        data: {
+          emailVerified: new Date(),
+        },
+      })
     },
+  },
+  callbacks: {
+    // async signIn({ user }) {
+    //   console.log('user', user)
+    //   if (!user.id) return false
+
+    //   const existingUser = await getUserById(user.id)
+
+    //   if (!existingUser || !existingUser.emailVerified) return false
+
+    //   return true
+    // },
     async session({ session, token }) {
       // token.sub is the id of the user
       if (token.sub && session.user) {
