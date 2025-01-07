@@ -29,13 +29,13 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'User already exists!' }
   }
 
-  // await db.user.create({
-  //   data: {
-  //     email,
-  //     name,
-  //     password: hashedPassword,
-  //   },
-  // })
+  await db.user.create({
+    data: {
+      email,
+      name,
+      password: hashedPassword,
+    },
+  })
 
   const verificationToken = await generateVerificationToken(email)
 
