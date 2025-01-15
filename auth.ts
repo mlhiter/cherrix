@@ -8,6 +8,7 @@ import { getUserById } from './data/user'
 import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation'
 import { generateTwoFactorToken } from '@/lib/tokens'
 import { sendTwoFactorConfirmationEmail } from '@/lib/mail'
+import { getAccountByUserId } from './data/account'
 
 export const {
   handlers: { GET, POST },
@@ -68,15 +69,26 @@ export const {
       if (token.isTwoFactorEnabled && session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
       }
+
+      if (session.user) {
+        session.user.name = token.name
+        session.user.email = token.email as string
+        session.user.isOAuth = token.isOAuth as boolean
+      }
       return session
     },
     async jwt({ token }) {
       if (!token.sub) return token
 
+      const existingAccount = await getAccountByUserId(token.sub)
+
       const existingUser = await getUserById(token.sub)
 
       if (!existingUser) return token
 
+      token.isOAuth = !!existingAccount
+      token.name = existingUser.name
+      token.email = existingUser.email
       token.role = existingUser.role
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled
 
