@@ -1,17 +1,18 @@
 'use client'
 
 import Link from 'next/link'
+import { FaUser } from 'react-icons/fa'
+import { LogOutIcon, SettingsIcon } from 'lucide-react'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { FaUser } from 'react-icons/fa'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { LogOutIcon } from 'lucide-react'
 
-import { useCurrentUser } from '@/hooks/use-current.user'
+import { useCurrentUser } from '@/hooks/use-current-user'
 import { LogoutButton } from './logout-button'
 
 export const UserButton = () => {
@@ -29,7 +30,10 @@ export const UserButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuItem>
-          <Link href="/settings">Settings</Link>
+          <Link href="/settings" className="flex w-full items-center gap-x-2">
+            <SettingsIcon className="mr-2 h-4 w-4" />
+            Settings
+          </Link>
         </DropdownMenuItem>
         <LogoutButton>
           <DropdownMenuItem>

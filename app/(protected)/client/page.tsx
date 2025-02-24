@@ -1,14 +1,15 @@
-import { auth } from '@/auth'
-import { UserInfo } from '@/components/user-info'
-import { currentUser } from '@/lib/auth'
+'use client'
 
-const ServerPage = async () => {
-  const user = await currentUser()
+import { UserInfo } from '@/components/user-info'
+import { useCurrentUser } from '@/hooks/use-current-user'
+
+const ClientPage = () => {
+  const user = useCurrentUser()
   return (
     <div className="flex flex-col gap-y-4">
-      <UserInfo user={user} label="Server component" />
+      <UserInfo user={user} label="Client component" />
     </div>
   )
 }
 
-export default ServerPage
+export default ClientPage

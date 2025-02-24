@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
-import { useCurrentUser } from '@/hooks/use-current.user'
+import { useCurrentUser } from '@/hooks/use-current-user'
 import { FormSuccess } from '@/components/form-success'
 import { FormError } from '@/components/form-error'
 import { UserRole } from '@prisma/client'
@@ -44,12 +44,12 @@ const SettingsPage = () => {
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
-      name: user?.name || undefined,
-      email: user?.email || undefined,
-      password: undefined,
-      newPassword: undefined,
-      isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
-      role: user?.role || undefined,
+      name: user?.name || '',
+      email: user?.email || '',
+      password: '',
+      newPassword: '',
+      isTwoFactorEnabled: user?.isTwoFactorEnabled || false,
+      role: user?.role || UserRole.USER,
     },
   })
 
