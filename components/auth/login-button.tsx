@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import { LoginForm } from './login-form'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../ui/dialog'
 
 interface LoginButtonProps {
   children: React.ReactNode
@@ -27,6 +27,7 @@ export const LoginButton: React.FC<LoginButtonProps> = ({
       <Dialog>
         <DialogTrigger asChild={asChild}>{children}</DialogTrigger>
         <DialogContent className="w-auto border-none bg-transparent p-0">
+          <DialogTitle className="sr-only">Login</DialogTitle>
           <LoginForm />
         </DialogContent>
       </Dialog>
