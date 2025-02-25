@@ -18,11 +18,11 @@ const AdminPage = () => {
         <RoleGate allowedRole={UserRole.ADMIN}>
           <FormSuccess message="You are authorized to access this page" />
           <p className="text-lg">{role}</p>
+          <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-md">
+            <p className="text-sm font-medium">Admin-only API Route</p>
+            <Button>Click to test</Button>
+          </div>
         </RoleGate>
-        <div className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-md">
-          <p className="text-sm font-medium">Admin-only API Route</p>
-          <Button>Click to test</Button>
-        </div>
       </CardContent>
     </Card>
   )
