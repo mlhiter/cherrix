@@ -10,6 +10,8 @@
     "ui": "pnpm dlx shadcn@latest add"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.2.0",
+    "@ai-sdk/react": "^1.1.20",
     "@auth/prisma-adapter": "^2.7.4",
     "@blocknote/core": "^0.22.0",
     "@blocknote/mantine": "^0.22.0",
@@ -24,6 +26,7 @@
     "@radix-ui/react-select": "^2.1.4",
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-switch": "^1.1.2",
+    "ai": "^4.1.50",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

@@ -1,45 +1,25 @@
 'use client'
 
-import { useState } from 'react'
-
-import { initialMessages } from '@/mock/chat'
-import { ChatMessage } from '@/types/chat'
+import { useChat } from '@ai-sdk/react'
 
 import { Card } from '@/components/ui/card'
 import { Header } from '@/components/header'
-import { ChatInput } from './components/chat-input'
 import { ChatMessage as ChatMessageComponent } from './components/chat-message'
+import { Mention } from './components/mention'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { PaperPlaneIcon } from '@radix-ui/react-icons'
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    maxSteps: 10,
+  })
 
-  const handleSendMessage = (content: string) => {
-    // 添加用户消息
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content,
-      role: 'user',
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit()
     }
-
-    setMessages((prev) => [...prev, userMessage])
-
-    // 模拟AI回复
-    setTimeout(() => {
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        content: `I received your message: "${content}"，processing...`,
-        role: 'assistant',
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      }
-      setMessages((prev) => [...prev, aiMessage])
-    }, 1000)
   }
 
   return (
@@ -52,14 +32,38 @@ export default function ChatPage() {
             <ChatMessageComponent
               key={message.id}
               content={message.content}
-              role={message.role}
-              timestamp={message.timestamp}
+              role={
+                message.role === 'assistant' || message.role === 'user'
+                  ? message.role
+                  : 'user'
+              }
             />
           ))}
         </div>
         {/* Input Area   */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-          <ChatInput onSendAction={handleSendMessage} />
+          <div className="flex w-full flex-col gap-2">
+            <Mention />
+            <div className="flex items-center gap-2">
+              <div className="flex flex-1 items-center gap-2 rounded-lg border p-2">
+                <Input
+                  className="flex-1 border-none shadow-none focus-visible:ring-0"
+                  placeholder="Input your message..."
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+              <Button
+                onClick={handleSubmit}
+                className="h-10 w-10 rounded-full p-0 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95"
+                disabled={!input.trim()}
+                aria-label="Send Message">
+                <PaperPlaneIcon className="h-5 w-5" />
+                <span className="sr-only">Send Message</span>
+              </Button>
+            </div>
+          </div>
         </div>
       </Card>
     </div>
