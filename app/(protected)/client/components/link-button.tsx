@@ -1,20 +1,37 @@
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export const LinkButton = ({
   onClick,
   label,
   icon,
+  isActive = false,
 }: {
   onClick: () => void
   label?: string
   icon?: React.ReactNode
+  isActive?: boolean
 }) => {
   return (
     <Button
-      className="w-full min-w-fit bg-white text-sm text-black hover:bg-gray-100"
+      className={cn(
+        'relative w-full min-w-fit text-sm transition-all duration-200 hover:bg-blue-50/70',
+        isActive
+          ? 'translate-y-[-1px] border border-blue-200 bg-blue-50 font-medium text-blue-600 shadow-[0_4px_12px_rgba(59,130,246,0.18)]'
+          : 'bg-white text-gray-700 hover:text-blue-600'
+      )}
       onClick={onClick}>
-      {icon}
-      {label}
+      <span
+        className={cn(
+          'flex items-center justify-center',
+          isActive && 'text-blue-500'
+        )}>
+        {icon}
+      </span>
+      {label && <span className="ml-2">{label}</span>}
+      {isActive && (
+        <div className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-b from-blue-50/30 to-blue-100/50 opacity-60" />
+      )}
     </Button>
   )
 }

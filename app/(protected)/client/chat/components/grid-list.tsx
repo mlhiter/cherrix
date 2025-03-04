@@ -1,7 +1,7 @@
 'use client'
 
 import { Card } from '@/components/ui/card'
-import { LinkButton } from './link-button'
+import { LinkButton } from '../../components/link-button'
 
 interface GridListProps {
   label: string
