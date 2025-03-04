@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 const minioClient = new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT as string,
-  useSSL: true,
+  useSSL: false,
   accessKey: process.env.MINIO_ACCESS_KEY as string,
   secretKey: process.env.MINIO_SECRET_KEY as string,
 })
@@ -13,19 +13,8 @@ export async function ensureBucketExists(bucketName: string): Promise<boolean> {
     const exists = await minioClient.bucketExists(bucketName)
     if (exists) {
       return true
-    } else {
-      console.log(`bucket '${bucketName}' not exists, try to create...`)
-      try {
-        await minioClient.makeBucket(
-          bucketName,
-          process.env.MINIO_REGION as string
-        )
-        return true
-      } catch (createError) {
-        console.error('create bucket failed:', createError)
-        return false
-      }
     }
+    return false
   } catch (error) {
     console.error('check bucket failed:', error)
     return false
@@ -38,6 +27,13 @@ export async function POST(req: Request) {
 
     const bucketReady = await ensureBucketExists(bucketName)
 
+    if (!bucketReady) {
+      return NextResponse.json(
+        { error: 'Bucket not found', details: 'Bucket not found' },
+        { status: 500 }
+      )
+    }
+
     const formData = await req.formData()
     const file = formData.get('file') as File
 
@@ -45,6 +41,8 @@ export async function POST(req: Request) {
     const fileStream = Buffer.from(fileBuffer)
 
     const fileName = `${Date.now()}-${file.name}`
+
+    const normalizedFolderPath = 'documents/'
 
     const objectKey = `${normalizedFolderPath}${fileName}`
 
@@ -55,8 +53,8 @@ export async function POST(req: Request) {
         fileStream
       )
 
-      const protocol = 'https://'
-      const fileUrl = `${protocol}${endPoint}/${bucketName}/${objectKey}`
+      const endPoint = process.env.MINIO_ENDPOINT as string
+      const fileUrl = `https://${endPoint}/${bucketName}/${objectKey}`
 
       return NextResponse.json({
         success: true,
@@ -70,12 +68,11 @@ export async function POST(req: Request) {
       })
     } catch (uploadError) {
       return NextResponse.json(
-        { error: 'Folder not found', details: (uploadError as Error).message },
+        { error: 'upload failed', details: (uploadError as Error).message },
         { status: 500 }
       )
     }
   } catch (error) {
-    console.error('file upload request failed:', error)
     return NextResponse.json(
       {
         error: 'file upload request failed',

@@ -13,70 +13,74 @@ export const UploadMethod = () => {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const Icon = ({ name }: { name: string }) => (
-    <span className="mr-2">
-      {name === 'local' ? '💾' : name === 'link' ? '🔗' : '📤'}
-    </span>
-  )
-
   const tabList = [
-    { label: 'Local', value: 'local', icon: <Icon name="local" /> },
-    { label: 'URL', value: 'url', icon: <Icon name="link" /> },
+    { label: 'Local', value: 'local', icon: <span className="mr-2">💾</span> },
+    { label: 'URL', value: 'url', icon: <span className="mr-2">🔗</span> },
     {
       label: 'Third-Party',
       value: 'third-party',
-      icon: <Icon name="upload" />,
+      icon: <span className="mr-2">📤</span>,
     },
   ]
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0])
+      const file = e.target.files[0]
+      setSelectedFile(file)
+      uploadFile(file)
     }
   }
 
-  const handleFileUpload = async () => {
-    if (!selectedFile) {
-      toast('Please select a file to upload', {
-        description: 'Please select a file to upload',
-      })
-      return
-    }
-
+  const uploadFile = async (file: File) => {
     try {
       setIsUploading(true)
       setUploadProgress(0)
 
       const formData = new FormData()
-      formData.append('file', selectedFile)
+      formData.append('file', file)
+
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval)
+            return prev
+          }
+          return prev + 10
+        })
+      }, 300)
 
       const response = await fetch('/api/s3/upload-file', {
         method: 'POST',
         body: formData,
       })
 
+      clearInterval(progressInterval)
+
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || '上传失败')
+        throw new Error(errorData.error || 'upload failed')
       }
-
-      const data = await response.json()
-
-      toast.success(`File ${data.originalName} has been uploaded successfully`)
 
       setSelectedFile(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
+
+      toast.success('Upload successful')
     } catch (error) {
-      toast.error((error as Error).message || 'Some error occurred')
+      toast.error((error as Error).message || 'upload failed')
     } finally {
       setIsUploading(false)
       setUploadProgress(100)
       setTimeout(() => setUploadProgress(0), 1000)
     }
+  }
+
+  const handleFileUpload = () => {
+    fileInputRef.current?.click()
   }
 
   const handleUrlImport = async () => {
@@ -110,16 +114,7 @@ export const UploadMethod = () => {
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.md,.txt"
                 />
                 <div className="flex items-center gap-2">
-                  <Button
-                    onClick={() => fileInputRef.current?.click()}
-                    variant="outline"
-                    className="w-40">
-                    Choose File
-                  </Button>
-                  <Button
-                    onClick={handleFileUpload}
-                    disabled={!selectedFile || isUploading}
-                    className="w-40">
+                  <Button onClick={handleFileUpload} className="w-40">
                     {isUploading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
