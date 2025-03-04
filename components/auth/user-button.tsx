@@ -35,6 +35,12 @@ export const UserButton = () => {
             Settings
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link href="/api-keys" className="flex w-full items-center gap-x-2">
+            <SettingsIcon className="mr-2 h-4 w-4" />
+            API Keys
+          </Link>
+        </DropdownMenuItem>
         <LogoutButton>
           <DropdownMenuItem>
             <LogOutIcon className="mr-2 h-4 w-4" />

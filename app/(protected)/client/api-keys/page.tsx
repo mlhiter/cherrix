@@ -1,22 +1,18 @@
 'use client'
 
-import { format } from 'date-fns'
 import { useChat } from '@ai-sdk/react'
-import { PaperPlaneIcon } from '@radix-ui/react-icons'
 
 import { Card } from '@/components/ui/card'
 import { Header } from '@/components/header'
-import { Input } from '@/components/ui/input'
-import { Mention } from './components/mention'
-import { Button } from '@/components/ui/button'
 import { ChatMessage as ChatMessageComponent } from './components/chat-message'
-
-import { initialMessages } from '@/mock/chat'
+import { Mention } from './components/mention'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { PaperPlaneIcon } from '@radix-ui/react-icons'
 
 export default function ChatPage() {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     maxSteps: 10,
-    initialMessages: initialMessages,
   })
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -36,7 +32,6 @@ export default function ChatPage() {
             <ChatMessageComponent
               key={message.id}
               content={message.content}
-              timestamp={format(message.createdAt ?? new Date(), 'HH:mm')}
               role={
                 message.role === 'assistant' || message.role === 'user'
                   ? message.role
