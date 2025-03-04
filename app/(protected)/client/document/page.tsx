@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { Header } from '@/components/header'
 import { FilePreview } from './components/file-preview'
-import { ImportMethod } from './components/import-method'
+import { UploadMethod } from './components/upload-method'
 import { DocumentList } from './components/document-list'
 
 import { Document } from '@/types/document'
@@ -33,7 +33,7 @@ export default function DocumentPage() {
       <div className="flex h-full gap-6">
         <div className="flex w-full flex-col gap-6">
           {/* Import Method Tabs */}
-          <ImportMethod />
+          <UploadMethod />
           {/* Document List Card */}
           <DocumentList
             documents={mockDocuments}
