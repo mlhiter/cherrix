@@ -31,4 +31,4 @@ export const apiAuthPrefix = '/api/auth'
  *
  * @type {string}
  */
-export const DEFAULT_REDIRECT_URL = '/settings'
+export const DEFAULT_REDIRECT_URL = '/client'
