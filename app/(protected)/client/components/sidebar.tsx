@@ -1,3 +1,5 @@
+'use client'
+
 import { useRouter } from 'next/navigation'
 import { Boxes, Code, File, MessageCircle, Notebook } from 'lucide-react'
 
