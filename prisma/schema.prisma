@@ -29,6 +29,7 @@ model User {
   accounts      Account[]
   isTwoFactorEnabled Boolean @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
+  documents     Document[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,4 +90,27 @@ model TwoFactorConfirmation {
   user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId])
+}
+
+model Document {
+  id            String  @id @default(cuid())
+  name          String
+  type          String
+  size          Int
+  path          String
+  url           String?
+  userId        String
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  importTime    DateTime @default(now())
+  isPublic      Boolean @default(false)
+  isDeleted     Boolean @default(false)
+  isArchived    Boolean @default(false)
+  isFavorite    Boolean @default(false)
+  isPinned      Boolean @default(false)
+  tags          String[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
 }
