@@ -8,14 +8,14 @@ import { FilePreview } from './components/file-preview'
 import { UploadMethod } from './components/upload-method'
 import { DocumentList } from './components/document-list'
 
-import { Document } from '@/types/document'
+import { MyDocument } from '@/types/document'
 
 export default function DocumentPage() {
-  const [selectedDocument, setSelectedDocument] = useState<null | Document>(
+  const [selectedDocument, setSelectedDocument] = useState<null | MyDocument>(
     null
   )
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [documents, setDocuments] = useState<Document[]>([])
+  const [documents, setDocuments] = useState<MyDocument[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchDocuments = async () => {
@@ -97,7 +97,7 @@ export default function DocumentPage() {
       {/*File Preview Drawer */}
       <FilePreview
         drawerOpen={drawerOpen}
-        setDrawerOpen={setDrawerOpen}
+        setDrawerOpenAction={setDrawerOpen}
         selectedDocument={selectedDocument}
       />
     </div>

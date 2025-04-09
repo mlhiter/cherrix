@@ -1,15 +1,18 @@
-export interface Document {
+export interface MyDocument {
   id: string
   name: string
+  path: string
+  url: string | null
   type: string
-  createdAt?: string
-  importTime?: string
-  content?: string
-  source?: string
-  tags?: string[]
-  isPublic?: boolean
-  isDeleted?: boolean
-  isArchived?: boolean
-  isFavorite?: boolean
-  isPinned?: boolean
+  importTime: Date
+  size: number
+  userId: string
+  isPublic: boolean
+  isDeleted: boolean
+  isArchived: boolean
+  isFavorite: boolean
+  isPinned: boolean
+  tags: string[]
+  createdAt: Date
+  updatedAt: Date
 }

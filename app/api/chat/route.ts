@@ -18,7 +18,5 @@ export async function POST(req: Request) {
     messages: convertToCoreMessages(messages),
   })
 
-  console.log(result)
-
   return result.toDataStreamResponse()
 }

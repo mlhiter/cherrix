@@ -1,14 +1,8 @@
-import * as Minio from 'minio'
 import { NextResponse } from 'next/server'
+
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-
-const minioClient = new Minio.Client({
-  endPoint: process.env.MINIO_ENDPOINT as string,
-  useSSL: false,
-  accessKey: process.env.MINIO_ACCESS_KEY as string,
-  secretKey: process.env.MINIO_SECRET_KEY as string,
-})
+import { minioClient } from '@/lib/minio'
 
 export async function ensureBucketExists(bucketName: string): Promise<boolean> {
   try {
@@ -72,8 +66,6 @@ export async function POST(req: Request) {
       const fileExtension = file.name.split('.').pop()?.toLowerCase() || ''
       const fileType = fileExtension
 
-      console.log('fileUrl', fileUrl)
-
       const document = await db.document.create({
         data: {
           name: file.name,
@@ -90,8 +82,6 @@ export async function POST(req: Request) {
           isPinned: false,
         },
       })
-
-      console.log('document', document)
 
       return NextResponse.json({
         success: true,

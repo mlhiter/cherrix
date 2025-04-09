@@ -22,11 +22,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import { Document } from '@/types/document'
+import { formatDate } from '@/lib/date'
+import { MyDocument } from '@/types/document'
 
 interface DocumentListProps {
-  documents: Document[]
-  setSelectedDocument: (document: Document) => void
+  documents: MyDocument[]
+  setSelectedDocument: (document: MyDocument) => void
   setDrawerOpen: (open: boolean) => void
   isLoading?: boolean
   onDelete?: (documentId: string) => void
@@ -39,15 +40,6 @@ export const DocumentList = ({
   isLoading = false,
   onDelete,
 }: DocumentListProps) => {
-  const formatDate = (dateString: string | Date) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-  }
-
   return (
     <Card className="flex-1 p-4">
       <div className="flex min-h-10 items-center justify-between">
