@@ -7,7 +7,11 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
-export const UploadMethod = () => {
+interface UploadMethodProps {
+  onUploadSuccess?: () => void
+}
+
+export const UploadMethod = ({ onUploadSuccess }: UploadMethodProps) => {
   const [urlInput, setUrlInput] = useState('')
   const [activeTab, setActiveTab] = useState('local')
   const [isUploading, setIsUploading] = useState(false)
@@ -52,7 +56,7 @@ export const UploadMethod = () => {
         })
       }, 300)
 
-      const response = await fetch('/api/s3/upload-file', {
+      const response = await fetch('/api/document/upload-file', {
         method: 'POST',
         body: formData,
       })
@@ -70,10 +74,15 @@ export const UploadMethod = () => {
       }
 
       toast.success('Upload successful')
+
+      if (onUploadSuccess) {
+        onUploadSuccess()
+      }
     } catch (error) {
       toast.error((error as Error).message || 'upload failed')
     } finally {
       setIsUploading(false)
+      setSelectedFile(null)
       setUploadProgress(100)
       setTimeout(() => setUploadProgress(0), 1000)
     }

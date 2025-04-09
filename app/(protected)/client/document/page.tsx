@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { toast } from 'sonner'
 
 import { Header } from '@/components/header'
 import { FilePreview } from './components/file-preview'
@@ -9,19 +10,67 @@ import { DocumentList } from './components/document-list'
 
 import { Document } from '@/types/document'
 
-// 模拟数据
-const mockDocuments = [
-  { id: '1', name: '项目计划书.pdf', type: 'pdf', importTime: '2023-12-01' },
-  { id: '2', name: '数据分析.xlsx', type: 'excel', importTime: '2023-12-05' },
-  { id: '3', name: '会议记录.docx', type: 'word', importTime: '2023-12-10' },
-  { id: '4', name: '研究报告.md', type: 'md', importTime: '2023-12-15' },
-]
-
 export default function DocumentPage() {
   const [selectedDocument, setSelectedDocument] = useState<null | Document>(
     null
   )
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [documents, setDocuments] = useState<Document[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const fetchDocuments = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/document')
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch documents')
+      }
+
+      const data = await response.json()
+
+      if (data.success) {
+        setDocuments(data.documents)
+      } else {
+        throw new Error(data.error || 'Failed to fetch documents')
+      }
+    } catch (error) {
+      toast.error((error as Error).message || 'Failed to fetch documents')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const deleteDocument = async (documentId: string) => {
+    try {
+      const response = await fetch('/api/document', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ documentId }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete document')
+      }
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Document deleted successfully')
+        fetchDocuments()
+      } else {
+        throw new Error(data.error || 'Failed to delete document')
+      }
+    } catch (error) {
+      toast.error((error as Error).message || 'Failed to delete document')
+    }
+  }
+
+  useEffect(() => {
+    fetchDocuments()
+  }, [])
 
   return (
     <div className="flex h-full flex-col gap-6">
@@ -33,12 +82,14 @@ export default function DocumentPage() {
       <div className="flex h-full gap-6">
         <div className="flex w-full flex-col gap-6">
           {/* Import Method Tabs */}
-          <UploadMethod />
+          <UploadMethod onUploadSuccess={fetchDocuments} />
           {/* Document List Card */}
           <DocumentList
-            documents={mockDocuments}
+            documents={documents}
             setSelectedDocument={setSelectedDocument}
             setDrawerOpen={setDrawerOpen}
+            isLoading={isLoading}
+            onDelete={deleteDocument}
           />
         </div>
       </div>

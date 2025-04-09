@@ -1,5 +1,7 @@
 import * as Minio from 'minio'
 import { NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import { db } from '@/lib/db'
 
 const minioClient = new Minio.Client({
   endPoint: process.env.MINIO_ENDPOINT as string,
@@ -23,6 +25,17 @@ export async function ensureBucketExists(bucketName: string): Promise<boolean> {
 
 export async function POST(req: Request) {
   try {
+    const session = await auth()
+
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized', details: 'User not authenticated' },
+        { status: 401 }
+      )
+    }
+
+    const userId = session.user.id
+
     const bucketName = process.env.MINIO_BUCKET_NAME as string
 
     const bucketReady = await ensureBucketExists(bucketName)
@@ -56,8 +69,33 @@ export async function POST(req: Request) {
       const endPoint = process.env.MINIO_ENDPOINT as string
       const fileUrl = `https://${endPoint}/${bucketName}/${objectKey}`
 
+      const fileExtension = file.name.split('.').pop()?.toLowerCase() || ''
+      const fileType = fileExtension
+
+      console.log('fileUrl', fileUrl)
+
+      const document = await db.document.create({
+        data: {
+          name: file.name,
+          type: fileType,
+          size: file.size,
+          path: objectKey,
+          url: fileUrl,
+          userId: userId,
+          tags: [],
+          isPublic: false,
+          isDeleted: false,
+          isArchived: false,
+          isFavorite: false,
+          isPinned: false,
+        },
+      })
+
+      console.log('document', document)
+
       return NextResponse.json({
         success: true,
+        document: document,
         etag: result.etag,
         fileName: fileName,
         originalName: file.name,

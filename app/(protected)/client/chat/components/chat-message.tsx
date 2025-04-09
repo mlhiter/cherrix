@@ -39,7 +39,7 @@ export const ChatMessage = ({ content, role, timestamp }: ChatMessageProps) => {
   return (
     <div className="flex items-start gap-2">
       <Avatar>
-        <AvatarImage src={user?.image || ''} />
+        <AvatarImage src={''} />
         <AvatarFallback className="bg-accent text-accent-foreground">
           🍒
         </AvatarFallback>

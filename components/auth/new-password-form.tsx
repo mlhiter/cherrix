@@ -1,7 +1,6 @@
 'use client'
 
 import * as z from 'zod'
-import Link from 'next/link'
 import { CardWrapper } from './card-wrapper'
 import { useState, useTransition } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
