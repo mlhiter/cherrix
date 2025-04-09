@@ -24,6 +24,7 @@ import {
 
 import { formatDate } from '@/lib/date'
 import { MyDocument } from '@/types/document'
+import { DocumentVectorize } from './document-vectorize'
 
 interface DocumentListProps {
   documents: MyDocument[]
@@ -61,7 +62,7 @@ export const DocumentList = ({
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Import Time</TableHead>
-                <TableHead>Operation</TableHead>
+                <TableHead className="w-[100px]">Operation</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -79,35 +80,38 @@ export const DocumentList = ({
                     {doc.importTime ? formatDate(doc.importTime) : '-'}
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <EllipsisVerticalIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedDocument(doc)
-                            setDrawerOpen(true)
-                          }}>
-                          <ListCollapse className="mr-2 h-4 w-4" />
-                          Detail
-                        </DropdownMenuItem>
-                        {onDelete && (
+                    <div className="flex items-center space-x-2">
+                      <DocumentVectorize document={doc} />
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <EllipsisVerticalIcon className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation()
-                              onDelete(doc.id)
-                            }}
-                            className="text-destructive transition-colors duration-200 hover:bg-destructive/10 focus:bg-destructive/10 focus:text-destructive">
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete
+                              setSelectedDocument(doc)
+                              setDrawerOpen(true)
+                            }}>
+                            <ListCollapse className="mr-2 h-4 w-4" />
+                            Detail
                           </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          {onDelete && (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onDelete(doc.id)
+                              }}
+                              className="text-destructive transition-colors duration-200 hover:bg-destructive/10 focus:bg-destructive/10 focus:text-destructive">
+                              <Trash className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
