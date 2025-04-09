@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 import { formatDate } from '@/lib/date'
 import { MyDocument } from '@/types/document'
 
@@ -9,11 +7,9 @@ import {
   Drawer,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-import { Button } from '@/components/ui/button'
 import { PdfRender } from './pdf-render'
 
 interface FilePreviewProps {
@@ -66,15 +62,6 @@ export const FilePreview = ({
               </div>
             )}
           </div>
-          <DrawerFooter>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => window.open(selectedDocument?.path, '_blank')}>
-                Open
-              </Button>
-              <Button variant="outline">Analyze</Button>
-            </div>
-          </DrawerFooter>
         </div>
       </DrawerContent>
     </Drawer>

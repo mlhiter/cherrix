@@ -52,7 +52,8 @@ export default function DocumentPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to delete document')
+        toast.error('Failed to delete document')
+        return
       }
 
       const data = await response.json()
@@ -61,7 +62,7 @@ export default function DocumentPage() {
         toast.success('Document deleted successfully')
         fetchDocuments()
       } else {
-        throw new Error(data.error || 'Failed to delete document')
+        toast.error(data.error || 'Failed to delete document')
       }
     } catch (error) {
       toast.error((error as Error).message || 'Failed to delete document')
