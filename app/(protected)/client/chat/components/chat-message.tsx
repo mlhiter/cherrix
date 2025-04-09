@@ -18,14 +18,17 @@ export const ChatMessage = ({ content, role, timestamp }: ChatMessageProps) => {
   if (role === 'user') {
     return (
       <div className="flex items-start justify-end gap-2">
-        <div className="rounded-lg bg-primary/90 p-3 text-primary-foreground">
-          <p>{content}</p>
+        <div>
+          <div className="rounded-lg bg-primary/90 p-3 text-primary-foreground">
+            {content}
+          </div>
           {timestamp && (
             <div className="mt-1 text-right text-xs opacity-70">
               {timestamp}
             </div>
           )}
         </div>
+
         <Avatar>
           <AvatarImage src={user?.image || ''} />
           <AvatarFallback className="bg-secondary">
@@ -44,8 +47,10 @@ export const ChatMessage = ({ content, role, timestamp }: ChatMessageProps) => {
           🍒
         </AvatarFallback>
       </Avatar>
-      <div className="rounded-lg bg-muted p-3 text-muted-foreground">
-        <p>{content}</p>
+      <div>
+        <div className="rounded-lg bg-muted p-3 text-muted-foreground">
+          {content}
+        </div>
         {timestamp && (
           <div className="mt-1 text-xs opacity-70">{timestamp}</div>
         )}
