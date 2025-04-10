@@ -1,4 +1,5 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter'
+
 import { Document } from '@langchain/core/documents'
 
 const CHUNK_SIZE = 500
@@ -15,7 +16,7 @@ export async function splitTextIntoChunks(text: string): Promise<Document[]> {
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: CHUNK_SIZE,
     chunkOverlap: CHUNK_OVERLAP,
-    separators: ['\n\n', '\n', '。', '，', ' ', ''], // 添加中文分隔符
+    separators: ['\n\n', '\n', '。', '，', ' ', ''],
   })
 
   return await splitter.createDocuments([text])

@@ -1,54 +1,46 @@
-import { OpenAIEmbeddings } from '@langchain/openai'
-import { Chroma } from '@langchain/community/vectorstores/chroma'
-import { Document } from '@langchain/core/documents'
 import { ChromaClient } from 'chromadb'
-import { CHROMA_CONFIG, EMBEDDING_CONFIG } from './chroma-config'
+import { OpenAIEmbeddings } from '@langchain/openai'
+import { Document } from '@langchain/core/documents'
+import { Chroma } from '@langchain/community/vectorstores/chroma'
 
 const embeddings = new OpenAIEmbeddings({
-  openAIApiKey: EMBEDDING_CONFIG.openAIApiKey,
-  modelName: EMBEDDING_CONFIG.modelName,
+  openAIApiKey: process.env.OPENAI_API_KEY,
+  modelName: process.env.EMBEDDING_MODEL_ID,
   configuration: {
-    baseURL: EMBEDDING_CONFIG.openAIBaseURL,
+    baseURL: process.env.OPENAI_API_URL,
   },
-  maxConcurrency: EMBEDDING_CONFIG.maxConcurrency,
-  timeout: EMBEDDING_CONFIG.timeout,
-  stripNewLines: EMBEDDING_CONFIG.stripNewLines,
+  maxConcurrency: 5,
+  timeout: 30000,
+  stripNewLines: true,
 })
 
 const client = new ChromaClient({
-  path: CHROMA_CONFIG.persistDirectory,
-  ...CHROMA_CONFIG.clientSettings,
+  path: process.env.CHROMA_SERVER_URL,
 })
+
+const collectionOptions = {
+  collectionName: process.env.CHROMA_COLLECTION_NAME,
+  url: process.env.CHROMA_SERVER_URL,
+  collectionMetadata: {
+    'hnsw:space': 'cosine',
+  },
+}
 
 export async function getVectorStore() {
   try {
-    return await Chroma.fromExistingCollection(embeddings, {
-      collectionName: CHROMA_CONFIG.collectionName,
-      url: CHROMA_CONFIG.persistDirectory,
-      collectionMetadata: {
-        'hnsw:space': 'cosine',
-      },
-    })
+    return await Chroma.fromExistingCollection(embeddings, collectionOptions)
   } catch (error) {
     console.warn('Collection not found, creating new one...')
-    return await Chroma.fromDocuments([], embeddings, {
-      collectionName: CHROMA_CONFIG.collectionName,
-      url: CHROMA_CONFIG.persistDirectory,
-      collectionMetadata: {
-        'hnsw:space': 'cosine',
-      },
-    })
+    return await Chroma.fromDocuments([], embeddings, collectionOptions)
   }
 }
 
 export async function addDocumentsToVectorStore(documents: Document[]) {
-  const store = await Chroma.fromDocuments(documents, embeddings, {
-    collectionName: CHROMA_CONFIG.collectionName,
-    url: CHROMA_CONFIG.persistDirectory,
-    collectionMetadata: {
-      'hnsw:space': 'cosine',
-    },
-  })
+  const store = await Chroma.fromDocuments(
+    documents,
+    embeddings,
+    collectionOptions
+  )
   return store
 }
 
@@ -60,7 +52,7 @@ export async function similaritySearch(query: string, k: number = 4) {
 export async function deleteCollection() {
   try {
     await client.deleteCollection({
-      name: CHROMA_CONFIG.collectionName,
+      name: process.env.CHROMA_COLLECTION_NAME!,
     })
   } catch (error) {
     console.error('Error deleting collection:', error)
@@ -70,19 +62,19 @@ export async function deleteCollection() {
 export async function getCollectionStats() {
   try {
     const collection = await client.getOrCreateCollection({
-      name: CHROMA_CONFIG.collectionName,
+      name: process.env.CHROMA_COLLECTION_NAME!,
     })
     const count = await collection.count()
 
     return {
       documentCount: count,
-      collectionName: CHROMA_CONFIG.collectionName,
+      collectionName: process.env.CHROMA_COLLECTION_NAME,
     }
   } catch (error) {
     console.error('Error getting collection stats:', error)
     return {
       documentCount: 0,
-      collectionName: CHROMA_CONFIG.collectionName,
+      collectionName: process.env.CHROMA_COLLECTION_NAME,
     }
   }
 }

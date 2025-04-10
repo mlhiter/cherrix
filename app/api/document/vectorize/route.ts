@@ -33,7 +33,6 @@ export async function POST(req: Request) {
     const buffer = Buffer.concat(chunks)
 
     let text: string
-    console.log(buffer)
 
     if (fileType === 'pdf') {
       const pdfData = await pdf(buffer)
@@ -58,19 +57,17 @@ export async function POST(req: Request) {
   }
 }
 
-// 处理相似度搜索
+// similarity search
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const query = searchParams.get('query')
 
     if (!query) {
-      // 如果没有查询参数，返回集合统计信息
       const stats = await getCollectionStats()
       return NextResponse.json(stats)
     }
 
-    // 执行相似度搜索
     const results = await similaritySearch(query)
     return NextResponse.json({ results })
   } catch (error) {
