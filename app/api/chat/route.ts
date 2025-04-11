@@ -1,5 +1,6 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import { streamText, convertToCoreMessages } from 'ai'
+import { similaritySearch } from '@/lib/vector-store'
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30
@@ -11,6 +12,21 @@ const openai = createOpenAI({
 
 export async function POST(req: Request) {
   const { messages } = await req.json()
+
+  // Get the last user message
+  const lastUserMessage = messages
+    .slice()
+    .reverse()
+    .find((m: any) => m.role === 'user')
+
+  // Perform similarity search if there's a user message
+  let context = ''
+  if (lastUserMessage) {
+    const searchResults = await similaritySearch(lastUserMessage.content)
+    context = searchResults
+      .map((doc, index) => `[${index + 1}] ${doc.pageContent}`)
+      .join('\n\n')
+  }
 
   const result = streamText({
     model: openai('claude-3-7-sonnet-20250219'),
@@ -25,7 +41,7 @@ export async function POST(req: Request) {
       If a sentence draws from multiple contexts, please list all applicable citations, like [citation:1][citation:2].
       Other than code and specific names and citations, your answer must be written in the same language as the question.
       Be concise.
-      Context: {context}
+      Context: ${context}
       Remember: Cite contexts by their position number (1 for first context, 2 for second, etc.) and don't blindly repeat the contexts verbatim.`,
     messages: convertToCoreMessages(messages),
   })

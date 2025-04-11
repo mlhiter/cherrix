@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { deleteCollection, getCollectionStats } from '@/lib/vector-store'
 
-// 获取向量化状态
 export async function GET() {
   try {
     const stats = await getCollectionStats()
@@ -14,7 +13,6 @@ export async function GET() {
   }
 }
 
-// 删除向量化数据
 export async function DELETE() {
   try {
     await deleteCollection()
