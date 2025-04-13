@@ -3,18 +3,20 @@
 import { format } from 'date-fns'
 import { useChat } from '@ai-sdk/react'
 import { PaperPlaneIcon } from '@radix-ui/react-icons'
+import { Loader2, AlertCircle } from 'lucide-react'
 
 import { Card } from '@/components/ui/card'
 import { Header } from '@/components/header'
 import { Input } from '@/components/ui/input'
-import { Mention } from './components/mention'
 import { Button } from '@/components/ui/button'
+
+import { Mention } from './components/mention'
 import { ChatMessage as ChatMessageComponent } from './components/chat-message'
 
-import { initialMessages } from '@/mock/chat'
+import { initialMessages } from '@/constants/chat'
 
 export default function ChatPage() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     maxSteps: 10,
     initialMessages: initialMessages,
   })
@@ -44,6 +46,24 @@ export default function ChatPage() {
               }
             />
           ))}
+          {status === 'submitted' && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Message sent, waiting for response...</span>
+            </div>
+          )}
+          {status === 'streaming' && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>AI is responding...</span>
+            </div>
+          )}
+          {status === 'error' && (
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              <span>Failed to get response. Please try again.</span>
+            </div>
+          )}
         </div>
         {/* Input Area   */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
@@ -57,14 +77,25 @@ export default function ChatPage() {
                   value={input}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
+                  disabled={status === 'submitted' || status === 'streaming'}
                 />
               </div>
               <Button
                 onClick={handleSubmit}
                 className="h-10 w-10 rounded-full p-0 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95"
-                disabled={!input.trim()}
+                disabled={
+                  !input.trim() ||
+                  status === 'submitted' ||
+                  status === 'streaming'
+                }
                 aria-label="Send Message">
-                <PaperPlaneIcon className="h-5 w-5" />
+                {status === 'submitted' || status === 'streaming' ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : status === 'error' ? (
+                  <AlertCircle className="h-5 w-5" />
+                ) : (
+                  <PaperPlaneIcon className="h-5 w-5" />
+                )}
                 <span className="sr-only">Send Message</span>
               </Button>
             </div>
