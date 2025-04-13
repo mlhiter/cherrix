@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { useChat } from '@ai-sdk/react'
 import { PaperPlaneIcon } from '@radix-ui/react-icons'
 import { Loader2, AlertCircle } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 import { Card } from '@/components/ui/card'
 import { Header } from '@/components/header'
@@ -20,6 +21,16 @@ export default function ChatPage() {
     maxSteps: 10,
     initialMessages: initialMessages,
   })
+
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -50,6 +61,7 @@ export default function ChatPage() {
                     }
                   />
                 ))}
+                <div ref={messagesEndRef} />
                 {status === 'submitted' && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
