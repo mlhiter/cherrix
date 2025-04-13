@@ -47,6 +47,8 @@ export default function CodePage() {
     return () => {
       if (instance) {
         instance.teardown()
+        setInstance(null)
+        setStatus('idle')
       }
     }
   }, [])
