@@ -16,7 +16,8 @@ const nextConfig: NextConfig = {
     //https://webcontainers.io/guides/quickstart
     return [
       {
-        source: '/client/code',
+        // Apply these headers to all routes
+        source: '/:path*',
         headers: [
           {
             key: 'Cross-Origin-Embedder-Policy',
