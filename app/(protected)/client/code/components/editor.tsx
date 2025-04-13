@@ -40,6 +40,7 @@ export const CodeEditor = forwardRef<EditorRef, EditorProps>(
         )
         const tsconfig = JSON.parse(tsconfigContent)
 
+        // FIXME： opening ts file will cause moduleResolution bug
         monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
           ...tsconfig.compilerOptions,
           allowNonTsExtensions: true,

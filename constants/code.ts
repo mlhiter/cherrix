@@ -21,7 +21,7 @@ export const initialFiles = {
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "typescript": "^5.3.0",
+    "typescript": "^5",
     "eslint": "^8.56.0",
     "eslint-config-next": "14.1.0"
   }
@@ -33,7 +33,7 @@ export const initialFiles = {
       contents: `
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -42,7 +42,7 @@ export const initialFiles = {
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
