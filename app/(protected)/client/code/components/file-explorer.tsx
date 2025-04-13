@@ -3,7 +3,7 @@
 import { WebContainer } from '@webcontainer/api'
 import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronRight, File, Folder } from 'lucide-react'
-import { useFileSystemStore } from '@/stores/fileSystem'
+import { useFileSystemStore } from '@/stores/file-system'
 
 interface FileExplorerProps {
   webcontainerInstance: WebContainer | null
@@ -85,7 +85,7 @@ export function FileExplorer({
   }
 
   return (
-    <div className="h-full overflow-y-auto border-r border-gray-200">
+    <div className="h-full overflow-y-auto">
       <div className="mb-2 rounded-md rounded-b-none border-b border-gray-200 bg-gray-100 p-2 text-sm font-medium">
         File Explorer
       </div>

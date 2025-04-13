@@ -4,7 +4,7 @@ import { WebContainer } from '@webcontainer/api'
 import { forwardRef, useImperativeHandle } from 'react'
 import MonacoEditor, { loader } from '@monaco-editor/react'
 
-import { useFileSystemStore } from '@/stores/fileSystem'
+import { useFileSystemStore } from '@/stores/file-system'
 import { MONACO_EDITOR_CONFIG } from '@/constants/monaco-editor'
 
 loader.config({

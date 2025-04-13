@@ -1,45 +1,55 @@
 'use client'
 
 import { Loader } from 'lucide-react'
-import { useEffectOnce } from 'react-use'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
+import { Preview } from './components/preview'
 import { Terminal } from './components/terminal'
-import { initialFiles } from '@/constants/code'
 import { FileExplorer } from './components/file-explorer'
-import { CodeEditor, EditorRef } from './components/editor'
+import { CodeEditor, EditorRef } from './components/code-editor'
+
+import { initialFiles } from '@/constants/code'
 import { getWebContainerInstance } from '@/lib/webcontainer'
+import { useWebContainerStore } from '@/stores/web-container'
 
 export default function CodePage() {
-  const [webcontainerInstance, setWebcontainerInstance] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
   const editorRef = useRef<EditorRef>(null)
+  const [loading, setLoading] = useState(true)
+  const [iframeUrl, setIframeUrl] = useState<string>('')
 
-  useEffectOnce(() => {
+  const { instance, setInstance, setStatus } = useWebContainerStore()
+
+  useEffect(() => {
     async function bootWebContainer() {
       try {
         setLoading(true)
-        const instance = await getWebContainerInstance()
-        setWebcontainerInstance(instance)
+        setStatus('starting')
+        const webcontainerInstance = await getWebContainerInstance()
 
-        await instance.mount(initialFiles)
-
-        instance.on('server-ready', (port: number, url: string) => {
-          if (iframeRef.current) {
-            iframeRef.current.src = url
-          }
-          console.log('WebContainer instance started:', url, port)
+        webcontainerInstance.on('server-ready', (port: number, url: string) => {
+          setStatus('running')
+          setIframeUrl(url)
         })
+
+        await webcontainerInstance.mount(initialFiles)
+
+        setInstance(webcontainerInstance)
       } catch (error) {
         console.error('WebContainer instance failed to start:', error)
+        setStatus('error')
       } finally {
         setLoading(false)
       }
     }
 
     bootWebContainer()
-  })
+
+    return () => {
+      if (instance) {
+        instance.teardown()
+      }
+    }
+  }, [])
 
   if (loading) {
     return (
@@ -52,33 +62,29 @@ export default function CodePage() {
   return (
     <div className="flex h-full flex-col gap-4 p-4">
       <div className="grid flex-1 grid-cols-3 gap-4">
+        {/* File Explorer */}
         <div className="col-span-1 rounded-lg border border-gray-200">
           <FileExplorer
-            webcontainerInstance={webcontainerInstance}
+            webcontainerInstance={instance}
             onFileSelectAction={(path) => {
               editorRef.current?.loadFile(path)
             }}
           />
         </div>
 
+        {/* Code Editor and Terminal */}
         <div className="col-span-1 flex flex-col gap-4">
           <div className="flex-1 rounded-lg border border-gray-200">
-            <CodeEditor
-              ref={editorRef}
-              webcontainerInstance={webcontainerInstance}
-            />
+            <CodeEditor ref={editorRef} webcontainerInstance={instance} />
           </div>
           <div className="h-48 rounded-lg border border-gray-200">
-            <Terminal webcontainerInstance={webcontainerInstance} />
+            <Terminal webcontainerInstance={instance} />
           </div>
         </div>
 
+        {/* Preview */}
         <div className="col-span-1 rounded-lg border border-gray-200">
-          <iframe
-            ref={iframeRef}
-            className="h-full w-full rounded-lg"
-            title="WebContainer Preview"
-          />
+          <Preview iframeUrl={iframeUrl} />
         </div>
       </div>
     </div>

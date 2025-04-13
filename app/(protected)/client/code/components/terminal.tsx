@@ -49,7 +49,7 @@ export function Terminal({ webcontainerInstance }: TerminalProps) {
   }
 
   return (
-    <div className="flex h-full flex-col rounded-lg border border-gray-200 bg-gray-50 font-mono text-gray-800 shadow-lg">
+    <div className="flex h-full flex-col rounded-lg border-gray-200 bg-gray-50 font-mono text-gray-800">
       <div className="mb-2 rounded-md rounded-b-none border-b border-gray-200 bg-gray-100 p-2 text-sm font-medium">
         <span className="text-sm text-gray-500">Terminal</span>
       </div>
@@ -58,7 +58,7 @@ export function Terminal({ webcontainerInstance }: TerminalProps) {
         className="flex-1 overflow-y-auto whitespace-pre-wrap bg-white p-4 font-mono text-sm">
         {cleanAnsiEscapeSequences(output)}
       </div>
-      <div className="flex items-center border-t border-gray-200 bg-gray-50 p-3">
+      <div className="flex items-center rounded-lg bg-gray-50 p-3">
         <span className="mr-2 font-bold text-green-600">$</span>
         <input
           type="text"

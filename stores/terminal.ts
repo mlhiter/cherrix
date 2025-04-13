@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { WebContainer } from '@webcontainer/api'
-import { useFileSystemStore } from '@/stores/fileSystem'
+import { useFileSystemStore } from '@/stores/file-system'
+import { useWebContainerStore } from '@/stores/web-container'
 
 interface TerminalState {
   output: string
@@ -21,6 +22,10 @@ export const useTerminalStore = create<TerminalState>((set, get) => ({
 
   executeCommand: async (webcontainerInstance, command) => {
     if (!webcontainerInstance) return
+
+    if (command === 'npm install') {
+      useWebContainerStore.getState().setStatus('installing')
+    }
 
     set((state) => ({ output: state.output + `$ ${command}\n`, input: '' }))
 
@@ -49,6 +54,7 @@ export const useTerminalStore = create<TerminalState>((set, get) => ({
       }
     } catch (error) {
       set((state) => ({ output: state.output + `\nError: ${error}\n` }))
+      useWebContainerStore.getState().setStatus('error')
     }
   },
 
