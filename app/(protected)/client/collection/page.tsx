@@ -46,7 +46,6 @@ export default function CollectionPage() {
     setIsDialogOpen(true)
   }
 
-  // TODO: Ensure the same originalUrl can only be added once
   const handleSourceSubmit = async (data: {
     name: string
     url: string
@@ -55,6 +54,15 @@ export default function CollectionPage() {
     if (!selectedSource) return
 
     try {
+      // Check if URL already exists
+      const existingCollection = items.find(
+        (item) => item.originalUrl === data.url
+      )
+      if (existingCollection) {
+        toast.error('This URL has already been added to your collection')
+        return
+      }
+
       // 1. fetch content
       const fetchResponse = await fetch('/api/collection/fetch', {
         method: 'POST',

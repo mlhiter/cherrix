@@ -123,21 +123,22 @@ model Document {
 }
 
 model Collection {
-  id            String          @id @default(cuid())
+  id            String      @id @default(cuid())
   name          String
   sourceType    SourceType
   originalUrl   String
   lastSyncTime  DateTime
   syncFrequency String
   userId        String
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   docItems      DocItem[]
   blogItems     BlogItem[]
   githubItems   GithubItem[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@index([userId])
+  @@unique([originalUrl, userId])
 }
 
 model DocItem {

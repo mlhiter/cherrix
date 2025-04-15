@@ -4,7 +4,7 @@ import Parser from 'rss-parser'
 
 const parser = new Parser()
 
-// TODO: Success to fetch the content from the official document
+// TODO: fetch the content from the official document
 async function fetchOfficialDoc(url: string) {
   return {
     content: `This is the content fetched from ${url}...`,
@@ -45,7 +45,7 @@ async function fetchRssBlog(url: string) {
   }
 }
 
-// TODO: Success to fetch the content from the Github repository
+// TODO: fetch the content from the Github repository
 async function fetchGithub(url: string) {
   return {
     content: `This is the content fetched from ${url}...`,
