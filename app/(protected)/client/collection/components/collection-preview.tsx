@@ -1,7 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import rehypeRaw from 'rehype-raw'
 import { Loader2 } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import { useEffect, useState } from 'react'
+
 import {
   Drawer,
   DrawerContent,
@@ -11,8 +14,6 @@ import {
 } from '@/components/ui/drawer'
 import { CollectionItem, BlogItem } from '@/types/collection'
 import { BlogDetailDialog } from './blog-detail-dialog'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
 
 interface CollectionPreviewProps {
   drawerOpen: boolean
