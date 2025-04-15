@@ -31,6 +31,16 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+
+  // for rss blog image
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
 }
 
 export default nextConfig
