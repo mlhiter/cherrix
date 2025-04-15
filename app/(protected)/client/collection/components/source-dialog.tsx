@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
+
 import {
   Dialog,
   DialogContent,
@@ -34,13 +36,21 @@ export function SourceDialog({
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
   const [syncFrequency, setSyncFrequency] = useState('every-day')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit({ name, url, syncFrequency })
-    setName('')
-    setUrl('')
-    setSyncFrequency('every-day')
+    setIsSubmitting(true)
+    try {
+      await onSubmit({ name, url, syncFrequency })
+      setName('')
+      setUrl('')
+      setSyncFrequency('every-day')
+    } catch (error) {
+      console.error('Failed to submit:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (!source) return null
@@ -104,7 +114,16 @@ export function SourceDialog({
           </div>
 
           <DialogFooter>
-            <Button type="submit">Confirm Add</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                'Confirm Add'
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

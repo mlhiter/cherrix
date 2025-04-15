@@ -46,6 +46,7 @@ export default function CollectionPage() {
     setIsDialogOpen(true)
   }
 
+  // TODO: Ensure the same originalUrl can only be added once
   const handleSourceSubmit = async (data: {
     name: string
     url: string
@@ -85,6 +86,7 @@ export default function CollectionPage() {
           syncFrequency: data.syncFrequency,
           content: fetchResult.content,
           metadata: fetchResult.metadata,
+          items: fetchResult.items,
         }),
       })
 

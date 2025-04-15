@@ -1,4 +1,3 @@
-import { zhCN } from 'date-fns/locale'
 import { formatDistanceToNow } from 'date-fns'
 import { Eye, Trash, RefreshCw } from 'lucide-react'
 
@@ -43,7 +42,10 @@ export function CollectionList({
       </TableHeader>
       <TableBody>
         {items.map((item) => (
-          <TableRow key={item.id}>
+          <TableRow
+            key={item.id}
+            className="cursor-pointer hover:bg-muted/50"
+            onClick={() => onView(item)}>
             <TableCell>{item.name}</TableCell>
             <TableCell>
               {item.sourceType === 'OFFICIAL_DOC'
@@ -57,18 +59,20 @@ export function CollectionList({
                 href={item.originalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline">
+                className="text-blue-500 hover:underline"
+                onClick={(e) => e.stopPropagation()}>
                 {item.originalUrl}
               </a>
             </TableCell>
             <TableCell>
               {formatDistanceToNow(new Date(item.lastSyncTime), {
                 addSuffix: true,
-                locale: zhCN,
               })}
             </TableCell>
             <TableCell>{item.syncFrequency}</TableCell>
-            <TableCell className="space-x-2">
+            <TableCell
+              className="space-x-2"
+              onClick={(e) => e.stopPropagation()}>
               <Button
                 variant="ghost"
                 size="icon"

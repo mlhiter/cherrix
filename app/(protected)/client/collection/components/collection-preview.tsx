@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import {
   Drawer,
   DrawerContent,
@@ -7,7 +8,6 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from '@/components/ui/drawer'
-
 import { CollectionItem } from '@/types/collection'
 
 interface CollectionPreviewProps {
@@ -21,6 +21,35 @@ export const CollectionPreview = ({
   setDrawerOpenAction,
   selectedItem,
 }: CollectionPreviewProps) => {
+  const [collectionWithItems, setCollectionWithItems] =
+    useState<CollectionItem | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchCollectionItems = async () => {
+      if (!selectedItem) return
+
+      setIsLoading(true)
+      try {
+        const response = await fetch(`/api/collection/${selectedItem.id}/items`)
+        const data = await response.json()
+        console.log('data', data)
+
+        if (data.success) {
+          setCollectionWithItems(data.collection)
+        }
+      } catch (error) {
+        console.error('Failed to fetch collection items:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (drawerOpen && selectedItem) {
+      fetchCollectionItems()
+    }
+  }, [drawerOpen, selectedItem])
+
   return (
     <Drawer
       direction="right"
@@ -36,15 +65,29 @@ export const CollectionPreview = ({
             </DrawerDescription>
           </DrawerHeader>
           <div className="flex-1 overflow-auto px-4">
-            {selectedItem && (
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : collectionWithItems ? (
               <div className="flex flex-col gap-4">
-                <div className="rounded-md bg-gray-100 p-4">
-                  <div className="whitespace-pre-wrap">
-                    {selectedItem.content}
+                {collectionWithItems.docItems?.map((item) => (
+                  <div key={item.id} className="rounded-md bg-gray-100 p-4">
+                    <div className="whitespace-pre-wrap">{item.content}</div>
                   </div>
-                </div>
+                ))}
+                {collectionWithItems.blogItems?.map((item) => (
+                  <div key={item.id} className="rounded-md bg-gray-100 p-4">
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <div className="whitespace-pre-wrap">{item.content}</div>
+                  </div>
+                ))}
+                {collectionWithItems.githubItems?.map((item) => (
+                  <div key={item.id} className="rounded-md bg-gray-100 p-4">
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <div className="whitespace-pre-wrap">{item.content}</div>
+                  </div>
+                ))}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </DrawerContent>
