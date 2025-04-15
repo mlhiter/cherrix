@@ -25,6 +25,7 @@ import {
 import { formatDate } from '@/lib/date'
 import { MyDocument } from '@/types/document'
 import { DocumentVectorize } from './document-vectorize'
+import { EmptyState } from '@/components/empty-state'
 
 interface DocumentListProps {
   documents: MyDocument[]
@@ -52,9 +53,12 @@ export const DocumentList = ({
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : documents.length === 0 ? (
-          <div className="flex h-40 items-center justify-center">
-            <p className="text-muted-foreground">No documents found</p>
-          </div>
+          <EmptyState
+            title="No Documents"
+            description="No documents found in this collection. Documents will appear here once they are added."
+            icon="document"
+            className="h-[300px]"
+          />
         ) : (
           <Table>
             <TableHeader>

@@ -173,16 +173,11 @@ export default function CollectionPage() {
         description="Collect and sync content from different sources, including official documents, RSS blogs, and Github repositories."
       />
 
-      <div className="flex flex-col gap-8">
-        {/* Source List */}
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">Source List</h2>
+      <div className="flex h-full gap-6">
+        <div className="flex w-full flex-col gap-6">
+          {/* Source List */}
           <SourceList onSourceSelect={handleSourceSelect} />
-        </div>
-
-        {/* Collection List */}
-        <div>
-          <h2 className="mb-4 text-xl font-semibold">Collection List</h2>
+          {/* Collection List */}
           <CollectionList
             items={items}
             onView={handleViewItem}
