@@ -18,37 +18,26 @@ async function fetchOfficialDoc(url: string) {
 async function fetchRssBlog(url: string) {
   try {
     const feed = await parser.parseURL(url)
-
     // fetch the latest 10 posts
-    const latestPosts = feed.items.slice(0, 10).map((item) => ({
+    const items = feed.items.slice(0, 10).map((item) => ({
       title: item.title,
-      link: item.link,
+      url: item.link,
       content: item.content || item.contentSnippet,
-      pubDate: item.pubDate || item.isoDate,
+      publishDate:
+        item.pubDate || item.isoDate
+          ? new Date(item.pubDate || item.isoDate || '')
+          : null,
+      author: item.creator || item.author,
+      lastSyncTime: new Date(),
     }))
 
-    // build the content
-    const content = latestPosts
-      .map(
-        (post) => `
-# ${post.title}
-
-Published at: ${post.pubDate}
-Original link: ${post.link}
-
-${post.content}
-    `
-      )
-      .join('\n\n---\n\n')
-
     return {
-      content,
+      items,
       metadata: {
         feedTitle: feed.title,
         feedDescription: feed.description,
         lastUpdated: new Date().toISOString(),
-        postCount: latestPosts.length,
-        posts: latestPosts,
+        postCount: items.length,
       },
     }
   } catch (error) {
@@ -93,7 +82,7 @@ export async function POST(request: Request) {
         success: false,
         error: (error as Error).message || 'Failed to fetch content',
       },
-      { status: 400 }
+      { status: 500 }
     )
   }
 }

@@ -18,6 +18,12 @@ enum UserRole {
   ADMIN
 }
 
+enum SourceType {
+  OFFICIAL_DOC
+  RSS_BLOG
+  GITHUB
+}
+
 model User {
   id            String          @id @default(cuid())
   name          String?
@@ -30,6 +36,7 @@ model User {
   isTwoFactorEnabled Boolean @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
   documents     Document[]
+  collections   Collection[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -113,4 +120,71 @@ model Document {
   updatedAt     DateTime @updatedAt
 
   @@index([userId])
+}
+
+model Collection {
+  id            String          @id @default(cuid())
+  name          String
+  sourceType    SourceType
+  originalUrl   String
+  lastSyncTime  DateTime
+  syncFrequency String
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  docItems      DocItem[]
+  blogItems     BlogItem[]
+  githubItems   GithubItem[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([userId])
+}
+
+model DocItem {
+  id            String      @id @default(cuid())
+  title         String
+  url           String
+  content       String?     @db.Text
+  lastSyncTime  DateTime
+  collectionId  String
+  collection    Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([collectionId])
+}
+
+model BlogItem {
+  id            String      @id @default(cuid())
+  title         String
+  url           String
+  content       String?     @db.Text
+  publishDate   DateTime?
+  author        String?
+  lastSyncTime  DateTime
+  collectionId  String
+  collection    Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([collectionId])
+}
+
+model GithubItem {
+  id            String      @id @default(cuid())
+  name          String
+  url           String
+  readme        String?     @db.Text
+  description   String?
+  stars         Int?
+  forks         Int?
+  language      String?
+  topics        String[]
+  lastSyncTime  DateTime
+  collectionId  String
+  collection    Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([collectionId])
 }

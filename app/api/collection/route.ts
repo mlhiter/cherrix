@@ -1,47 +1,103 @@
 import { NextResponse } from 'next/server'
-import { CollectionItem } from '@/types/collection'
 
-let collections: CollectionItem[] = [
-  {
-    id: '1',
-    name: 'React Documentation',
-    sourceType: 'OFFICIAL_DOC',
-    originalUrl: 'https://react.dev',
-    lastSyncTime: '2024-03-20T10:00:00Z',
-    syncFrequency: 'every-day',
-    content: 'React is a JavaScript library for building user interfaces...',
-  },
-  {
-    id: '2',
-    name: 'Next.js Blog',
-    sourceType: 'RSS_BLOG',
-    originalUrl: 'https://nextjs.org/blog',
-    lastSyncTime: '2024-03-20T09:00:00Z',
-    syncFrequency: 'every-week',
-    content: 'Latest updates and announcements from the Next.js team...',
-  },
-]
+import { db } from '@/lib/db'
+import { auth } from '@/auth'
+import { SourceType } from '@prisma/client'
 
 // GET /api/collection
 export async function GET() {
-  return NextResponse.json({ success: true, collections })
+  try {
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const collections = await db.collection.findMany({
+      where: {
+        userId: session.user.id,
+      },
+    })
+
+    return NextResponse.json({ success: true, collections })
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch collections' },
+      { status: 500 }
+    )
+  }
 }
 
 // POST /api/collection
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const newCollection: CollectionItem = {
-      id: Date.now().toString(),
-      ...body,
-      lastSyncTime: new Date().toISOString(),
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
-    collections.push(newCollection)
+
+    // TODO: we need to zod validate the request body nad fetch
+    const { name, sourceType, originalUrl, syncFrequency, items } =
+      await request.json()
+
+    const newCollection = await db.collection.create({
+      data: {
+        name,
+        sourceType: sourceType as SourceType,
+        originalUrl,
+        syncFrequency,
+        userId: session.user.id!,
+        lastSyncTime: new Date(),
+      },
+    })
+
+    if (items && items.length > 0) {
+      switch (sourceType) {
+        case 'OFFICIAL_DOC':
+          await db.docItem.createMany({
+            data: items.map((item: any) => ({
+              ...item,
+              collectionId: newCollection.id,
+              lastSyncTime: new Date(),
+            })),
+          })
+          break
+        case 'RSS_BLOG':
+          await db.blogItem.createMany({
+            data: items.map((item: any) => ({
+              title: item.title,
+              url: item.url,
+              content: item.content,
+              publishDate: item.publishDate,
+              author: item.author,
+              collectionId: newCollection.id,
+              lastSyncTime: item.lastSyncTime,
+            })),
+          })
+          break
+        case 'GITHUB':
+          await db.githubItem.createMany({
+            data: items.map((item: any) => ({
+              ...item,
+              collectionId: newCollection.id,
+              lastSyncTime: new Date(),
+            })),
+          })
+          break
+      }
+    }
+
     return NextResponse.json({ success: true, collection: newCollection })
   } catch (error) {
+    console.error('Failed to create collection', error)
     return NextResponse.json(
       { success: false, error: 'Failed to create collection' },
-      { status: 400 }
+      { status: 500 }
     )
   }
 }
@@ -49,13 +105,28 @@ export async function POST(request: Request) {
 // DELETE /api/collection
 export async function DELETE(request: Request) {
   try {
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { id } = await request.json()
-    collections = collections.filter((item) => item.id !== id)
+
+    await db.collection.delete({
+      where: {
+        id,
+        userId: session.user.id,
+      },
+    })
+
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json(
       { success: false, error: 'Failed to delete collection' },
-      { status: 400 }
+      { status: 500 }
     )
   }
 }
