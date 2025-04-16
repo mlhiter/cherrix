@@ -37,6 +37,8 @@ model User {
   twoFactorConfirmation TwoFactorConfirmation?
   documents     Document[]
   collections   Collection[]
+  notes         Note[]          @relation("NoteCollaborators")
+  createdNotes  Note[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,4 +190,18 @@ model GithubItem {
   updatedAt     DateTime    @updatedAt
 
   @@index([collectionId])
+}
+
+model Note {
+  id            String    @id @default(cuid())
+  title         String
+  content       String    @db.Text
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPublic      Boolean   @default(false)
+  collaborators User[]    @relation("NoteCollaborators")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
 }

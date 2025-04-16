@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { Boxes, Code, File, MessageCircle, Notebook } from 'lucide-react'
 
-import { PinList } from './pin-list'
 import { LinkButton } from './link-button'
+import { ResourceList } from './resource-list'
 import { Divider } from '@/components/divider'
 
 export const Sidebar = () => {
@@ -47,8 +47,8 @@ export const Sidebar = () => {
         isActive={pathname === '/client/code'}
       />
       <Divider />
-      {/* Pin */}
-      <PinList />
+      {/* Resource List */}
+      <ResourceList />
     </div>
   )
 }

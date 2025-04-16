@@ -1,0 +1,127 @@
+'use client'
+
+import { toast } from 'sonner'
+import dynamic from 'next/dynamic'
+import { useParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState, useCallback } from 'react'
+
+const Editor = dynamic(() => import('../components/editor'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center">
+      Loading editor...
+    </div>
+  ),
+})
+
+interface Note {
+  id: string
+  title: string
+  content: string
+  isPublic: boolean
+  collaborators: { id: string }[]
+}
+
+interface User {
+  id: string
+  name: string | null
+  image: string | null
+}
+
+export default function NotePage() {
+  const params = useParams()
+  const { data: session } = useSession()
+  const noteId = params.noteId as string
+  const [note, setNote] = useState<Note | null>(null)
+  const [collaborators, setCollaborators] = useState<User[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const fetchNote = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/notes/${noteId}`)
+      if (!response.ok) {
+        toast.error('Failed to fetch note')
+        return
+      }
+      const data = await response.json()
+      setNote(data)
+      setCollaborators(data.collaborators || [])
+    } catch (error) {
+      console.error('Error fetching note:', error)
+      setCollaborators([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [noteId])
+
+  const saveNote = useCallback(
+    async (content: string) => {
+      if (!session?.user || !note) return
+      setIsSaving(true)
+      try {
+        const response = await fetch(`/api/notes/${note.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content,
+            title: note.title,
+            isPublic: note.isPublic,
+            collaborators: (note.collaborators || []).map((c) => c.id),
+          }),
+        })
+        if (!response.ok) {
+          throw new Error('Failed to save note')
+        }
+        toast.success('Note saved successfully')
+      } catch (error) {
+        console.error('Error saving note:', error)
+        toast.error('Save failed, please try again')
+      } finally {
+        setIsSaving(false)
+      }
+    },
+    [session?.user, note]
+  )
+
+  useEffect(() => {
+    if (noteId) {
+      fetchNote()
+    }
+  }, [noteId, fetchNote])
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        Loading...
+      </div>
+    )
+  }
+
+  if (!note) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        Note not found
+      </div>
+    )
+  }
+  console.log('note', note)
+  console.log('collaborators', collaborators)
+
+  return (
+    <div className="flex h-full w-full flex-col">
+      <div className="flex items-center justify-center text-2xl font-bold">
+        Notebook
+      </div>
+      <div className="flex-1">
+        <Editor
+          note={note}
+          collaborators={collaborators}
+          isSaving={isSaving}
+          onSave={saveNote}
+        />
+      </div>
+    </div>
+  )
+}
