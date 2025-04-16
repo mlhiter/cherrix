@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from 'date-fns'
-import { Eye, Trash, RefreshCw, Loader2 } from 'lucide-react'
+import { Eye, Trash, RefreshCw, Loader2, Boxes } from 'lucide-react'
 
 import {
   Table,
@@ -44,7 +44,7 @@ export function CollectionList({
           <EmptyState
             title="No Collections"
             description="You haven't created any collections yet. Start by adding a new collection."
-            icon="collection"
+            icon={Boxes}
             className="h-[350px]"
           />
         ) : (

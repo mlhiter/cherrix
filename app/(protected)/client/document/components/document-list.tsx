@@ -3,6 +3,7 @@ import {
   ListCollapse,
   Trash,
   Loader2,
+  File,
 } from 'lucide-react'
 
 import {
@@ -56,7 +57,7 @@ export const DocumentList = ({
           <EmptyState
             title="No Documents"
             description="No documents found in this collection. Documents will appear here once they are added."
-            icon="document"
+            icon={File}
             className="h-[300px]"
           />
         ) : (

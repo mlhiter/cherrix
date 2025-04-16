@@ -1,21 +1,19 @@
 import { cn } from '@/lib/utils'
-import { FileText, FolderOpen } from 'lucide-react'
+import { FileText, LucideIcon } from 'lucide-react'
 
 interface EmptyStateProps {
   title: string
   description?: string
-  icon?: 'document' | 'collection'
+  icon?: LucideIcon
   className?: string
 }
 
 export function EmptyState({
   title,
   description,
-  icon = 'document',
+  icon: Icon = FileText,
   className,
 }: EmptyStateProps) {
-  const Icon = icon === 'document' ? FileText : FolderOpen
-
   return (
     <div
       className={cn(
