@@ -1,127 +1,124 @@
 'use client'
 
-import { format } from 'date-fns'
-import { useChat } from '@ai-sdk/react'
-import { PaperPlaneIcon } from '@radix-ui/react-icons'
-import { Loader2, AlertCircle } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { Plus } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
+import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Header } from '@/components/header'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 
-import { Mention } from './components/mention'
-import { ChatMessage as ChatMessageComponent } from './components/chat-message'
-
-import { initialMessages } from '@/constants/chat'
+interface Chat {
+  id: string
+  title: string
+  isPublic: boolean
+  user: {
+    id: string
+    name: string | null
+    image: string | null
+  }
+  collaborators: {
+    id: string
+    name: string | null
+    image: string | null
+  }[]
+  createdAt: string
+  updatedAt: string
+}
 
 export default function ChatPage() {
-  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
-    maxSteps: 10,
-    initialMessages: initialMessages,
-  })
-
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const router = useRouter()
+  const [chats, setChats] = useState<Chat[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit()
+    const fetchChats = async () => {
+      try {
+        const response = await fetch('/api/chats')
+        if (!response.ok) {
+          throw new Error('Failed to fetch chats')
+        }
+        const data = await response.json()
+        setChats(data)
+      } catch (error) {
+        console.error('Error fetching chats:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
+
+    fetchChats()
+  }, [])
+
+  const handleCreateChat = async () => {
+    try {
+      const response = await fetch('/api/chats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: 'New Chat',
+          isPublic: false,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create chat')
+      }
+
+      const chat = await response.json()
+      router.push(`/client/chat/${chat.id}`)
+    } catch (error) {
+      console.error('Error creating chat:', error)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        Loading...
+      </div>
+    )
   }
 
   return (
     <div className="flex h-full flex-col gap-4">
       <Header title="Chat" />
-
-      <div className="flex h-[calc(100vh-190px)] flex-col">
-        <Card className="relative flex-1 overflow-hidden">
-          <div className="flex h-full flex-col">
-            {/* Message List */}
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <ChatMessageComponent
-                    key={message.id}
-                    content={message.content}
-                    timestamp={format(message.createdAt ?? new Date(), 'HH:mm')}
-                    role={
-                      message.role === 'assistant' || message.role === 'user'
-                        ? message.role
-                        : 'user'
-                    }
-                  />
-                ))}
-                <div ref={messagesEndRef} />
-                {status === 'submitted' && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Message sent, waiting for response...</span>
-                  </div>
-                )}
-                {status === 'streaming' && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>AI is responding...</span>
-                  </div>
-                )}
-                {status === 'error' && (
-                  <div className="flex items-center gap-2 text-destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <span>Failed to get response. Please try again.</span>
-                  </div>
-                )}
+      <div className="flex flex-1 flex-col gap-4">
+        <div className="flex justify-end">
+          <Button onClick={handleCreateChat}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Chat
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {chats.map((chat) => (
+            <Card
+              key={chat.id}
+              className="flex cursor-pointer flex-col gap-2 p-4 hover:bg-accent"
+              onClick={() => router.push(`/client/chat/${chat.id}`)}>
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">{chat.title}</h3>
+                <span className="text-sm text-muted-foreground">
+                  {new Date(chat.updatedAt).toLocaleDateString()}
+                </span>
               </div>
-            </div>
-            {/* Input Area */}
-            <div className="border-t bg-white p-4">
-              <div className="flex w-full flex-col gap-2">
-                <Mention />
-                <div className="flex items-center gap-2">
-                  <div className="flex flex-1 items-center gap-2 rounded-lg border p-2">
-                    <Input
-                      className="flex-1 border-none shadow-none focus-visible:ring-0"
-                      placeholder="Input your message..."
-                      value={input}
-                      onChange={handleInputChange}
-                      onKeyDown={handleKeyDown}
-                      disabled={
-                        status === 'submitted' || status === 'streaming'
-                      }
+              <div className="flex items-center gap-2">
+                <div className="flex -space-x-2">
+                  {[chat.user, ...chat.collaborators].map((user) => (
+                    <img
+                      key={user.id}
+                      src={user.image || '/default-avatar.png'}
+                      alt={user.name || 'User'}
+                      className="h-6 w-6 rounded-full border-2 border-background"
                     />
-                  </div>
-                  <Button
-                    onClick={handleSubmit}
-                    className="h-10 w-10 rounded-full p-0 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95"
-                    disabled={
-                      !input.trim() ||
-                      status === 'submitted' ||
-                      status === 'streaming'
-                    }
-                    aria-label="Send Message">
-                    {status === 'submitted' || status === 'streaming' ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : status === 'error' ? (
-                      <AlertCircle className="h-5 w-5" />
-                    ) : (
-                      <PaperPlaneIcon className="h-5 w-5" />
-                    )}
-                    <span className="sr-only">Send Message</span>
-                  </Button>
+                  ))}
                 </div>
               </div>
-            </div>
-          </div>
-        </Card>
+            </Card>
+          ))}
+        </div>
       </div>
     </div>
   )

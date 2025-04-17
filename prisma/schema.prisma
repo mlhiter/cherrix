@@ -39,6 +39,8 @@ model User {
   collections   Collection[]
   notes         Note[]          @relation("NoteCollaborators")
   createdNotes  Note[]
+  chats         Chat[]          @relation("ChatCollaborators")
+  createdChats  Chat[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -204,4 +206,36 @@ model Note {
   updatedAt     DateTime  @updatedAt
 
   @@index([userId])
+}
+
+model Chat {
+  id            String    @id @default(cuid())
+  title         String
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPublic      Boolean   @default(false)
+  collaborators User[]    @relation("ChatCollaborators")
+  messages      ChatMessage[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model ChatMessage {
+  id        String    @id @default(cuid())
+  content   String    @db.Text
+  role      ChatRole
+  chatId    String
+  chat      Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([chatId])
+}
+
+enum ChatRole {
+  USER
+  ASSISTANT
+  SYSTEM
 }

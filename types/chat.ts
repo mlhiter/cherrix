@@ -1,6 +1,7 @@
+import { ChatRole } from '@prisma/client'
 export interface ChatMessage {
   id: string
   content: string
-  role: 'assistant' | 'user'
+  role: ChatRole
   createdAt: Date
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { FaUser } from 'react-icons/fa'
+import { ChatRole } from '@prisma/client'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
@@ -8,14 +9,14 @@ import { useCurrentUser } from '@/hooks/use-current-user'
 
 interface ChatMessageProps {
   content: string
-  role: 'assistant' | 'user'
+  role: ChatRole
   timestamp?: string
 }
 
 export const ChatMessage = ({ content, role, timestamp }: ChatMessageProps) => {
   const user = useCurrentUser()
 
-  if (role === 'user') {
+  if (role === 'USER') {
     return (
       <div className="flex items-start justify-end gap-2">
         <div className="rounded-lg bg-primary/90 p-3 text-primary-foreground">
