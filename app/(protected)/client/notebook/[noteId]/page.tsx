@@ -110,18 +110,13 @@ export default function NotePage() {
   console.log('collaborators', collaborators)
 
   return (
-    <div className="flex h-full w-full flex-col">
-      <div className="flex items-center justify-center text-2xl font-bold">
-        Notebook
-      </div>
-      <div className="flex-1">
-        <Editor
-          note={note}
-          collaborators={collaborators}
-          isSaving={isSaving}
-          onSave={saveNote}
-        />
-      </div>
+    <div className="flex-1">
+      <Editor
+        note={note}
+        collaborators={collaborators}
+        isSaving={isSaving}
+        onSaveAction={saveNote}
+      />
     </div>
   )
 }

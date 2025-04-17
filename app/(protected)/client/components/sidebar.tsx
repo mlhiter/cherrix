@@ -19,17 +19,17 @@ export const Sidebar = () => {
         <LinkButton
           onClick={() => router.push('/client/document')}
           icon={<File />}
-          isActive={pathname === '/client/document'}
+          isActive={pathname.startsWith('/client/document')}
         />
         <LinkButton
           onClick={() => router.push('/client/collection')}
           icon={<Boxes />}
-          isActive={pathname === '/client/collection'}
+          isActive={pathname.startsWith('/client/collection')}
         />
         <LinkButton
           onClick={() => router.push('/client/notebook')}
           icon={<Notebook />}
-          isActive={pathname === '/client/notebook'}
+          isActive={pathname.startsWith('/client/notebook')}
         />
       </div>
       {/* Chat */}
@@ -37,14 +37,14 @@ export const Sidebar = () => {
         onClick={() => router.push('/client/chat')}
         icon={<MessageCircle />}
         label="Chat"
-        isActive={pathname === '/client/chat'}
+        isActive={pathname.startsWith('/client/chat')}
       />
       {/* Code */}
       <LinkButton
         onClick={() => router.push('/client/code')}
         icon={<Code />}
         label="Code"
-        isActive={pathname === '/client/code'}
+        isActive={pathname.startsWith('/client/code')}
       />
       <Divider />
       {/* Resource List */}

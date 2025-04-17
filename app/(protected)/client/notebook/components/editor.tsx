@@ -26,10 +26,15 @@ interface EditorProps {
   note: Note
   collaborators: User[]
   isSaving: boolean
-  onSave: (content: string) => Promise<void>
+  onSaveAction: (content: string) => Promise<void>
 }
 
-export function Editor({ note, collaborators, isSaving, onSave }: EditorProps) {
+export default function Editor({
+  note,
+  collaborators,
+  isSaving,
+  onSaveAction: onSave,
+}: EditorProps) {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const editor = useCreateBlockNote({
