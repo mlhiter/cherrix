@@ -81,13 +81,13 @@ export async function POST(
 
     let context = ''
 
+    // TODO: The context needs to be more focused; the current context is too scattered.
     if (lastUserMessage) {
       const searchResults = await similaritySearch(lastUserMessage.content)
       context = searchResults
         .map((doc, index) => `[${index + 1}] ${doc.pageContent}`)
         .join('\n\n')
     }
-    console.log('context', context)
 
     // Get AI response
     const result = streamText({
