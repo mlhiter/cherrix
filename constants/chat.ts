@@ -20,32 +20,4 @@ export const initialMessages: ChatMessage[] = [
     role: 'assistant',
     createdAt: new Date(),
   },
-  {
-    id: '4',
-    content:
-      'This is a knowledge management and AI assistant application, you can use it to manage notes, documents, code, and analyze and process information through AI.',
-    role: 'assistant',
-    createdAt: new Date(),
-  },
-  {
-    id: '5',
-    content:
-      'This is a knowledge management and AI assistant application, you can use it to manage notes, documents, code, and analyze and process information through AI.',
-    role: 'assistant',
-    createdAt: new Date(),
-  },
-  {
-    id: '6',
-    content:
-      'This is a knowledge management and AI assistant application, you can use it to manage notes, documents, code, and analyze and process information through AI.',
-    role: 'assistant',
-    createdAt: new Date(),
-  },
-  {
-    id: '7',
-    content:
-      'This is a knowledge management and AI assistant application, you can use it to manage notes, documents, code, and analyze and process information through AI.',
-    role: 'assistant',
-    createdAt: new Date(),
-  },
 ]
