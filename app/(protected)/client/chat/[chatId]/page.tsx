@@ -1,11 +1,12 @@
 'use client'
 
 import { format } from 'date-fns'
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertCircle } from 'lucide-react'
 import { ChatRole } from '@prisma/client'
 import { useParams } from 'next/navigation'
-import { useEffect, useState, useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { PaperPlaneIcon } from '@radix-ui/react-icons'
+import { useChat } from '@ai-sdk/react'
 
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,57 +15,49 @@ import { Header } from '@/components/header'
 
 import { ChatMessage as ChatMessageComponent } from '../components/chat-message'
 
-interface Chat {
-  id: string
-  title: string
-  isPublic: boolean
-  user: {
-    id: string
-    name: string | null
-    image: string | null
-  }
-  collaborators: {
-    id: string
-    name: string | null
-    image: string | null
-  }[]
-  messages: {
-    id: string
-    content: string
-    role: ChatRole
-    createdAt: string
-  }[]
-}
-
 export default function ChatPage() {
   const params = useParams()
   const chatId = params.chatId as string
-  const [chat, setChat] = useState<Chat | null>(null)
-  const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [initialMessages, setInitialMessages] = useState([])
 
   useEffect(() => {
-    const fetchChat = async () => {
+    const fetchInitialMessages = async () => {
       try {
-        const response = await fetch(`/api/chats/${chatId}`)
+        const response = await fetch(`/api/chats/${chatId}/messages`)
         if (!response.ok) {
-          throw new Error('Failed to fetch chat')
+          throw new Error('Failed to fetch messages')
         }
         const data = await response.json()
-        setChat(data)
+        setInitialMessages(data)
       } catch (error) {
-        console.error('Error fetching chat:', error)
-      } finally {
-        setIsLoading(false)
+        console.error('Error fetching initial messages:', error)
       }
     }
-
-    if (chatId) {
-      fetchChat()
-    }
+    fetchInitialMessages()
   }, [chatId])
+
+  const { messages, input, handleInputChange, handleSubmit, status } = useChat({
+    maxSteps: 10,
+    initialMessages,
+    api: `/api/chats/${chatId}/messages`,
+    onFinish: async (message) => {
+      const response = await fetch(`/api/chats/${chatId}/messages`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: message.content,
+          role: 'assistant',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to store message')
+      }
+    },
+  })
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -72,190 +65,85 @@ export default function ChatPage() {
 
   useEffect(() => {
     scrollToBottom()
-  }, [chat?.messages])
-
-  const handleSubmit = async () => {
-    if (!input.trim() || !chat) return
-
-    setIsSubmitting(true)
-    try {
-      // Send user message
-      const userMessageResponse = await fetch(`/api/chats/${chatId}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: input,
-          role: 'USER',
-        }),
-      })
-
-      if (!userMessageResponse.ok) {
-        throw new Error('Failed to send message')
-      }
-
-      const userMessage = await userMessageResponse.json()
-
-      // Update chat with user message
-      setChat((prev) => {
-        if (!prev) return null
-        return {
-          ...prev,
-          messages: [...prev.messages, userMessage],
-        }
-      })
-
-      // Get AI response
-      const aiResponse = await fetch(`/api/chats/${chatId}/messages`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: '',
-          role: 'ASSISTANT',
-        }),
-      })
-
-      if (!aiResponse.ok) {
-        throw new Error('Failed to get AI response')
-      }
-
-      // Create a temporary AI message
-      const tempAiMessage = {
-        id: 'temp',
-        content: '',
-        role: 'ASSISTANT' as const,
-        createdAt: new Date().toISOString(),
-      }
-
-      setChat((prev) => {
-        if (!prev) return null
-        return {
-          ...prev,
-          messages: [...prev.messages, tempAiMessage],
-        }
-      })
-
-      // Handle streaming response
-      const reader = aiResponse.body?.getReader()
-      if (!reader) {
-        throw new Error('No reader available')
-      }
-
-      let aiMessageContent = ''
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        const chunk = new TextDecoder().decode(value)
-        aiMessageContent += chunk
-
-        setChat((prev) => {
-          if (!prev) return null
-          const messages = [...prev.messages]
-          const lastMessage = messages[messages.length - 1]
-          if (lastMessage.id === 'temp') {
-            lastMessage.content = aiMessageContent
-          }
-          return {
-            ...prev,
-            messages,
-          }
-        })
-      }
-
-      // Refresh chat to get final state
-      const response = await fetch(`/api/chats/${chatId}`)
-      if (!response.ok) {
-        throw new Error('Failed to fetch chat')
-      }
-      const data = await response.json()
-      setChat(data)
-      setInput('')
-    } catch (error) {
-      console.error('Error sending message:', error)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  }, [messages])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit()
+      handleSubmit(e as any)
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        Loading...
-      </div>
-    )
-  }
-
-  if (!chat) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        Chat not found
-      </div>
-    )
   }
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <Header title={chat.title} />
+      <Header title="Chat" />
       <div className="flex h-[calc(100vh-190px)] flex-col">
         <Card className="relative flex-1 overflow-hidden">
           <div className="flex h-full flex-col">
             {/* Message List */}
             <div className="flex-1 overflow-y-auto p-4">
               <div className="space-y-4">
-                {chat.messages.map((message) => (
+                {messages.map((message) => (
                   <ChatMessageComponent
                     key={message.id}
                     content={message.content}
-                    timestamp={format(new Date(message.createdAt), 'HH:mm')}
-                    role={message.role}
+                    timestamp={format(message.createdAt ?? new Date(), 'HH:mm')}
+                    role={message.role as ChatRole}
                   />
                 ))}
                 <div ref={messagesEndRef} />
-                {isSubmitting && (
+                {status === 'submitted' && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Message sent, waiting for response...</span>
+                  </div>
+                )}
+                {status === 'streaming' && (
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span>AI is responding...</span>
+                  </div>
+                )}
+                {status === 'error' && (
+                  <div className="flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>Failed to get response. Please try again.</span>
                   </div>
                 )}
               </div>
             </div>
             {/* Input Area */}
             <div className="border-t bg-white p-4">
-              <div className="flex items-center gap-2">
+              <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <div className="flex flex-1 items-center gap-2 rounded-lg border p-2">
                   <Input
                     className="flex-1 border-none shadow-none focus-visible:ring-0"
                     placeholder="Input your message..."
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={handleInputChange}
                     onKeyDown={handleKeyDown}
-                    disabled={isSubmitting}
+                    disabled={status === 'submitted' || status === 'streaming'}
                   />
                 </div>
                 <Button
-                  onClick={handleSubmit}
+                  type="submit"
                   className="h-10 w-10 rounded-full p-0 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95"
-                  disabled={!input.trim() || isSubmitting}
+                  disabled={
+                    !input.trim() ||
+                    status === 'submitted' ||
+                    status === 'streaming'
+                  }
                   aria-label="Send Message">
-                  {isSubmitting ? (
+                  {status === 'submitted' || status === 'streaming' ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : status === 'error' ? (
+                    <AlertCircle className="h-5 w-5" />
                   ) : (
                     <PaperPlaneIcon className="h-5 w-5" />
                   )}
                   <span className="sr-only">Send Message</span>
                 </Button>
-              </div>
+              </form>
             </div>
           </div>
         </Card>

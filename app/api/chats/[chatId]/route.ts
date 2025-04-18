@@ -8,6 +8,7 @@ export async function GET(
   { params }: { params: { chatId: string } }
 ) {
   try {
+    const { chatId } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json(
@@ -18,7 +19,7 @@ export async function GET(
 
     const chat = await db.chat.findUnique({
       where: {
-        id: params.chatId,
+        id: chatId,
         OR: [
           { userId: session.user.id },
           { collaborators: { some: { id: session.user.id } } },
@@ -69,6 +70,7 @@ export async function PATCH(
   { params }: { params: { chatId: string } }
 ) {
   try {
+    const { chatId } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json(
@@ -81,7 +83,7 @@ export async function PATCH(
 
     const chat = await db.chat.update({
       where: {
-        id: params.chatId,
+        id: chatId,
         userId: session.user.id,
       },
       data: {
@@ -124,6 +126,7 @@ export async function DELETE(
   { params }: { params: { chatId: string } }
 ) {
   try {
+    const { chatId } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json(
@@ -134,7 +137,7 @@ export async function DELETE(
 
     await db.chat.delete({
       where: {
-        id: params.chatId,
+        id: chatId,
         userId: session.user.id,
       },
     })

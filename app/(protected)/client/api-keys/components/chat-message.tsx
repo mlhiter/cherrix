@@ -16,7 +16,7 @@ interface ChatMessageProps {
 export const ChatMessage = ({ content, role, timestamp }: ChatMessageProps) => {
   const user = useCurrentUser()
 
-  if (role === 'USER') {
+  if (role === 'user') {
     return (
       <div className="flex items-start justify-end gap-2">
         <div className="rounded-lg bg-primary/90 p-3 text-primary-foreground">

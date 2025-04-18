@@ -3,10 +3,13 @@
 import { Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Header } from '@/components/header'
+import { initialMessages } from '@/constants/chat'
 
 interface Chat {
   id: string
@@ -32,23 +35,52 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const fetchChats = async () => {
+    const initializeChat = async () => {
       try {
+        setIsLoading(true)
+        // First, try to get existing chats
         const response = await fetch('/api/chats')
+
         if (!response.ok) {
-          throw new Error('Failed to fetch chats')
+          toast.error('Failed to fetch chats')
+          return
         }
-        const data = await response.json()
-        setChats(data)
+
+        const chats = await response.json()
+
+        if (chats && chats.length > 0) {
+          // If there are existing chats, redirect to the first one
+          router.push(`/client/chat/${chats[0].id}`)
+        } else {
+          // If no chats exist, create a new one
+          const createResponse = await fetch('/api/chats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: 'New Chat',
+              isPublic: false,
+              messages: initialMessages,
+            }),
+          })
+
+          if (!createResponse.ok) {
+            toast.error('Failed to create chat')
+            return
+          }
+
+          const data = await createResponse.json()
+          router.push(`/client/chat/${data.id}`)
+        }
       } catch (error) {
-        console.error('Error fetching chats:', error)
+        console.error('Error initializing chat:', error)
+        toast.error('Failed to initialize chat')
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchChats()
-  }, [])
+    initializeChat()
+  }, [router])
 
   const handleCreateChat = async () => {
     try {
@@ -77,7 +109,10 @@ export default function ChatPage() {
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        Loading...
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading chat...</p>
+        </div>
       </div>
     )
   }

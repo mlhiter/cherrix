@@ -234,8 +234,9 @@ model ChatMessage {
   @@index([chatId])
 }
 
+// NOTE: use lowercase for the role
 enum ChatRole {
-  USER
-  ASSISTANT
-  SYSTEM
+  user
+  assistant
+  system
 }
