@@ -11,6 +11,9 @@ const openai = createOpenAI({
   baseURL: process.env.OPENAI_API_URL,
 })
 
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30
+
 // get all messages for a chat
 export async function GET(
   req: Request,
@@ -62,8 +65,6 @@ export async function POST(
 
     const { messages } = await req.json()
 
-    console.log(messages)
-
     // NOTE: last message must be a user message
     const lastUserMessage = messages
       .slice()
@@ -79,12 +80,14 @@ export async function POST(
     })
 
     let context = ''
+
     if (lastUserMessage) {
       const searchResults = await similaritySearch(lastUserMessage.content)
       context = searchResults
         .map((doc, index) => `[${index + 1}] ${doc.pageContent}`)
         .join('\n\n')
     }
+    console.log('context', context)
 
     // Get AI response
     const result = streamText({
