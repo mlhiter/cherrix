@@ -1,14 +1,13 @@
 'use client'
 
-import { Plus } from 'lucide-react'
+import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Plus, Loader2 } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Header } from '@/components/header'
+import { Button } from '@/components/ui/button'
 import { initialMessages } from '@/constants/chat'
 
 interface Chat {

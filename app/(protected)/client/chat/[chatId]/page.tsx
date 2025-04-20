@@ -1,17 +1,17 @@
 'use client'
 
 import { format } from 'date-fns'
-import { Loader2, AlertCircle } from 'lucide-react'
+import { useChat } from '@ai-sdk/react'
 import { ChatRole } from '@prisma/client'
 import { useParams } from 'next/navigation'
+import { Loader2, AlertCircle } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
 import { PaperPlaneIcon } from '@radix-ui/react-icons'
-import { useChat } from '@ai-sdk/react'
 
 import { Card } from '@/components/ui/card'
+import { Header } from '@/components/header'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Header } from '@/components/header'
 
 import { ChatMessage as ChatMessageComponent } from '../components/chat-message'
 

@@ -3,6 +3,9 @@ import { OpenAIEmbeddings } from '@langchain/openai'
 import { Document } from '@langchain/core/documents'
 import { Chroma } from '@langchain/community/vectorstores/chroma'
 
+// Do not use pnpm in nextjs 15.4.0
+// https://github.com/huggingface/transformers.js/issues/210
+
 const embeddings = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY,
   modelName: process.env.EMBEDDING_MODEL_ID,

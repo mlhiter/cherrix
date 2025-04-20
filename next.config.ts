@@ -1,15 +1,13 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
   // https://www.npmjs.com/package/react-pdf
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        canvas: './empty-module.ts',
-      },
+  turbopack: {
+    resolveAlias: {
+      canvas: './empty-module.ts',
     },
   },
+
   reactStrictMode: false, // https://www.blocknotejs.org/docs/advanced/nextjs#react-19--next-15-strictmode
   serverExternalPackages: ['pdf-parse'], //https://stackoverflow.com/questions/76345917/read-pdf-content-in-next-js-13-api-route-handler-results-in-404
 
