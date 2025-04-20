@@ -2,6 +2,7 @@
 
 import { toast } from 'sonner'
 import dynamic from 'next/dynamic'
+import { Loader2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState, useCallback } from 'react'
@@ -93,7 +94,7 @@ export default function NotePage() {
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        Loading...
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     )
   }

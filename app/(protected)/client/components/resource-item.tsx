@@ -1,7 +1,7 @@
 import {
   LucideIcon,
-  MessageSquare,
-  FileMinus,
+  MessageCircle,
+  Notebook,
   Trash,
   Pencil,
 } from 'lucide-react'
@@ -24,8 +24,8 @@ interface ResourceItemProps {
 }
 
 const RESOURCE_ICONS: Record<string, LucideIcon> = {
-  note: FileMinus,
-  chat: MessageSquare,
+  note: Notebook,
+  chat: MessageCircle,
 }
 
 export const ResourceItem = ({
@@ -95,7 +95,7 @@ export const ResourceItem = ({
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
           onClick={(e) => {
             e.stopPropagation()
             onDelete(item.id)
