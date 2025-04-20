@@ -1,58 +1,106 @@
-import { FileMinus, Pin, MessageSquare } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+import { Pin, Plus } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ResourceItem } from './resource-item'
+import { initialMessages } from '@/constants/chat'
 
-interface Note {
+interface Resource {
   id: string
   title: string
 }
 
-interface Chat {
-  id: string
-  title: string
+type ResourceType = 'note' | 'chat'
+
+const useResources = (type: ResourceType) => {
+  const [resources, setResources] = useState<Resource[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+        const response = await fetch(endpoint)
+        if (!response.ok) throw new Error(`Failed to fetch ${type}s`)
+        const data = await response.json()
+        setResources(data)
+      } catch (error) {
+        console.error(`Error fetching ${type}s:`, error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchResources()
+  }, [type])
+
+  const handleDelete = async (id: string) => {
+    try {
+      const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+      const response = await fetch(`${endpoint}/${id}`, {
+        method: 'DELETE',
+      })
+      if (!response.ok) throw new Error(`Failed to delete ${type}`)
+      setResources(resources.filter((resource) => resource.id !== id))
+    } catch (error) {
+      console.error(`Error deleting ${type}:`, error)
+    }
+  }
+
+  const handleCreate = async (title: string) => {
+    try {
+      const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          ...(type === 'note' && {
+            content: [
+              {
+                type: 'paragraph',
+                content: 'Welcome to your new notebook!',
+              },
+            ],
+          }),
+          ...(type === 'chat' && {
+            messages: initialMessages,
+          }),
+        }),
+      })
+      if (!response.ok) throw new Error(`Failed to create ${type}`)
+      const newResource = await response.json()
+      setResources([...resources, newResource])
+      return newResource
+    } catch (error) {
+      console.error(`Error creating ${type}:`, error)
+      return null
+    }
+  }
+
+  return {
+    resources,
+    isLoading,
+    handleDelete,
+    handleCreate,
+  }
 }
 
 export const ResourceList = () => {
   const pathname = usePathname()
-  const [notes, setNotes] = useState<Note[]>([])
-  const [chats, setChats] = useState<Chat[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+  const [newTitle, setNewTitle] = useState('')
+  const [isCreating, setIsCreating] = useState(false)
 
-  useEffect(() => {
-    const fetchNotes = async () => {
-      try {
-        const response = await fetch('/api/notes')
-        if (!response.ok) throw new Error('Failed to fetch notes')
-        const data = await response.json()
-        setNotes(data)
-      } catch (error) {
-        console.error('Error fetching notes:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    const fetchChats = async () => {
-      try {
-        const response = await fetch('/api/chats')
-        if (!response.ok) throw new Error('Failed to fetch chats')
-        const data = await response.json()
-        setChats(data)
-      } catch (error) {
-        console.error('Error fetching chats:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (pathname.includes('/notebook')) {
-      fetchNotes()
-    } else if (pathname.includes('/chat')) {
-      fetchChats()
-    }
-  }, [pathname])
+  const resourceType: ResourceType = pathname.includes('/notebook')
+    ? 'note'
+    : 'chat'
+  const { resources, isLoading, handleDelete, handleCreate } =
+    useResources(resourceType)
 
   const getListTitle = () => {
     if (pathname.includes('/notebook')) return 'Notes'
@@ -61,48 +109,68 @@ export const ResourceList = () => {
     return 'Resources'
   }
 
-  const renderList = () => {
-    if (pathname.includes('/notebook')) {
-      return (
-        <div className="flex flex-col gap-2">
-          {notes.map((note) => (
-            <div key={note.id} className="flex min-h-6 items-center gap-2">
-              <FileMinus className="h-4 w-4" />
-              <div className="text-sm font-medium">{note.title}</div>
-            </div>
-          ))}
-        </div>
-      )
+  const handleCreateSubmit = async () => {
+    if (!newTitle.trim()) return
+    const newResource = await handleCreate(newTitle)
+    if (newResource) {
+      setNewTitle('')
+      setIsCreating(false)
+      const basePath =
+        resourceType === 'note' ? '/client/notebook' : '/client/chat'
+      router.push(`${basePath}/${newResource.id}`)
     }
-    if (pathname.includes('/chat')) {
-      return (
-        <div className="flex flex-col gap-2">
-          {chats.map((chat) => (
-            <div key={chat.id} className="flex min-h-6 items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              <div className="text-sm font-medium">{chat.title}</div>
-            </div>
-          ))}
-        </div>
-      )
-    }
-    return null
   }
 
   return (
     <div className="h-full w-full rounded-sm border-gray-200 p-2">
       <div className="flex flex-col gap-2">
-        <Button
-          variant="outline"
-          disabled
-          className="w-full border-none bg-transparent shadow-none">
-          <Pin />
-          {getListTitle()}
-        </Button>
+        <div className="flex items-center justify-between">
+          <Button
+            variant="outline"
+            disabled
+            className="border-none bg-transparent shadow-none">
+            <Pin className="mr-2 h-4 w-4" />
+            {getListTitle()}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsCreating(true)}>
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {isCreating && (
+          <div className="flex gap-2">
+            <Input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Enter title..."
+              className="h-8"
+            />
+            <Button
+              variant="outline"
+              className="h-8"
+              onClick={handleCreateSubmit}>
+              Create
+            </Button>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="text-sm text-gray-500">Loading...</div>
         ) : (
-          renderList()
+          <div className="flex flex-col gap-2">
+            {resources.map((resource) => (
+              <ResourceItem
+                key={resource.id}
+                item={resource}
+                type={resourceType}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
