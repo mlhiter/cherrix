@@ -82,11 +82,33 @@ const useResources = (type: ResourceType) => {
     }
   }
 
+  const handleRename = async (id: string, newTitle: string) => {
+    try {
+      const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+      const response = await fetch(`${endpoint}/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: newTitle }),
+      })
+      if (!response.ok) throw new Error(`Failed to rename ${type}`)
+      setResources(
+        resources.map((resource) =>
+          resource.id === id ? { ...resource, title: newTitle } : resource
+        )
+      )
+    } catch (error) {
+      console.error(`Error renaming ${type}:`, error)
+    }
+  }
+
   return {
     resources,
     isLoading,
     handleDelete,
     handleCreate,
+    handleRename,
   }
 }
 
@@ -99,7 +121,7 @@ export const ResourceList = () => {
   const resourceType: ResourceType = pathname.includes('/notebook')
     ? 'note'
     : 'chat'
-  const { resources, isLoading, handleDelete, handleCreate } =
+  const { resources, isLoading, handleDelete, handleCreate, handleRename } =
     useResources(resourceType)
 
   const getListTitle = () => {
@@ -168,6 +190,7 @@ export const ResourceList = () => {
                 item={resource}
                 type={resourceType}
                 onDelete={handleDelete}
+                onRename={handleRename}
               />
             ))}
           </div>
