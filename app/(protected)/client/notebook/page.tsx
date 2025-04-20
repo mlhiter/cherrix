@@ -33,12 +33,12 @@ export default function NotebookPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               title: 'Untitled Note',
-              content: JSON.stringify([
+              content: [
                 {
                   type: 'paragraph',
                   content: 'Welcome to your new notebook!',
                 },
-              ]),
+              ],
               isPublic: false,
               collaborators: [],
             }),
