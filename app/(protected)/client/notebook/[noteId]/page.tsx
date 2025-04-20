@@ -74,7 +74,6 @@ export default function NotePage() {
         if (!response.ok) {
           throw new Error('Failed to save note')
         }
-        toast.success('Note saved successfully')
       } catch (error) {
         console.error('Error saving note:', error)
         toast.error('Save failed, please try again')
@@ -106,8 +105,6 @@ export default function NotePage() {
       </div>
     )
   }
-  console.log('note', note)
-  console.log('collaborators', collaborators)
 
   return (
     <div className="flex-1">

@@ -34,6 +34,23 @@ const useResources = (type: ResourceType) => {
     }
 
     fetchResources()
+
+    const handleResourceUpdate = (event: CustomEvent) => {
+      if (event.detail.type === type) {
+        fetchResources()
+      }
+    }
+
+    window.addEventListener(
+      'resource-updated',
+      handleResourceUpdate as EventListener
+    )
+    return () => {
+      window.removeEventListener(
+        'resource-updated',
+        handleResourceUpdate as EventListener
+      )
+    }
   }, [type])
 
   const handleDelete = async (id: string) => {

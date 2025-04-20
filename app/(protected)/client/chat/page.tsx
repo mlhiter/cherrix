@@ -68,6 +68,9 @@ export default function ChatPage() {
           }
 
           const data = await createResponse.json()
+          window.dispatchEvent(
+            new CustomEvent('resource-updated', { detail: { type: 'chat' } })
+          )
           router.push(`/client/chat/${data.id}`)
         }
       } catch (error) {
@@ -99,6 +102,10 @@ export default function ChatPage() {
       }
 
       const chat = await response.json()
+      // 触发资源列表更新事件
+      window.dispatchEvent(
+        new CustomEvent('resource-updated', { detail: { type: 'chat' } })
+      )
       router.push(`/client/chat/${chat.id}`)
     } catch (error) {
       console.error('Error creating chat:', error)
