@@ -17,6 +17,7 @@ type ResourceType = 'note' | 'chat'
 const useResources = (type: ResourceType) => {
   const [resources, setResources] = useState<Resource[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -61,6 +62,13 @@ const useResources = (type: ResourceType) => {
       })
       if (!response.ok) throw new Error(`Failed to delete ${type}`)
       setResources(resources.filter((resource) => resource.id !== id))
+
+      // Check if we're currently viewing the deleted resource
+      const currentPath = window.location.pathname
+      if (currentPath.includes(`/${id}`)) {
+        const basePath = type === 'note' ? '/client/notebook' : '/client/chat'
+        router.push(basePath)
+      }
     } catch (error) {
       console.error(`Error deleting ${type}:`, error)
     }

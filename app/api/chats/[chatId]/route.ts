@@ -142,7 +142,7 @@ export async function DELETE(
       },
     })
 
-    return NextResponse.json(null, { status: 204 })
+    return NextResponse.json(null, { status: 200 })
   } catch (error) {
     console.error('Error deleting chat:', error)
     return NextResponse.json(

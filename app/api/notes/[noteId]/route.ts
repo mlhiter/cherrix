@@ -81,8 +81,8 @@ export async function PATCH(
     })
 
     return NextResponse.json(note)
-  } catch (error) {
-    console.error('[NOTES_PATCH]', error.details)
+  } catch (error: any) {
+    console.error('[NOTES_PATCH]', error)
     return NextResponse.json(
       {
         error: 'Internal Server Error',
@@ -117,8 +117,8 @@ export async function DELETE(
       },
     })
 
-    return new NextResponse(null, { status: 204 })
-  } catch (error) {
+    return new NextResponse(null, { status: 200 })
+  } catch (error: any) {
     console.error('[NOTES_DELETE]', error)
     return NextResponse.json(
       {
