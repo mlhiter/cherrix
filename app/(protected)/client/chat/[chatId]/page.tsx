@@ -134,9 +134,7 @@ export default function ChatPage() {
                     status === 'streaming'
                   }
                   aria-label="Send Message">
-                  {status === 'submitted' || status === 'streaming' ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : status === 'error' ? (
+                  {status === 'error' ? (
                     <AlertCircle className="h-5 w-5" />
                   ) : (
                     <PaperPlaneIcon className="h-5 w-5" />
