@@ -6,11 +6,6 @@ import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { similaritySearch } from '@/lib/vector-store'
 
-const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: process.env.OPENAI_API_URL,
-})
-
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30
 
@@ -89,11 +84,45 @@ export async function POST(
         .join('\n\n')
     }
 
+    let apiKeyConfig
+    if (process.env.NODE_ENV === 'development') {
+      apiKeyConfig = {
+        apiKey: process.env.OPENAI_API_KEY,
+        baseUrl: process.env.OPENAI_BASE_URL,
+        modelId: process.env.OPENAI_MODEL_ID,
+      }
+    } else {
+      // Get active API key
+      const apiKey = await db.apiKey.findFirst({
+        where: {
+          userId: session.user.id,
+          isActive: true,
+        },
+      })
+      console.log('apiKey', apiKey)
+
+      if (!apiKey) {
+        return NextResponse.json(
+          { success: false, error: 'No active API key found' },
+          { status: 400 }
+        )
+      }
+
+      apiKeyConfig = {
+        apiKey: apiKey.apiKey,
+        baseUrl: apiKey.baseUrl,
+        modelId: apiKey.modelId,
+      }
+    }
+
     // Get AI response
     const result = streamText({
-      model: openai('claude-3-7-sonnet-20250219'),
+      model: createOpenAI({
+        apiKey: apiKeyConfig.apiKey,
+        baseURL: apiKeyConfig.baseUrl,
+      })(apiKeyConfig.modelId as string),
       system: `
-          You are given a user question, and please write clean, concise and accurate answer to the question.
+          You are given a user question, and please write a clean, concise, and accurate answer to the question.
           You will be given a set of related contexts to the question, which are numbered sequentially starting from 1.
           Each context has an implicit reference number based on its position in the array (first context is 1, second is 2, etc.).
           Please use these contexts and cite them using the format [citation:x] at the end of each sentence where applicable.

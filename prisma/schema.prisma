@@ -41,6 +41,7 @@ model User {
   createdNotes  Note[]
   chats         Chat[]          @relation("ChatCollaborators")
   createdChats  Chat[]
+  apiKeys       ApiKey[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -239,4 +240,19 @@ enum ChatRole {
   user
   assistant
   system
+}
+
+model ApiKey {
+  id            String    @id @default(cuid())
+  name          String
+  apiKey        String
+  baseUrl       String
+  modelId       String
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
 }
