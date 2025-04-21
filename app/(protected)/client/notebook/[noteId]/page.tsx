@@ -9,7 +9,11 @@ import { useEffect, useState, useCallback } from 'react'
 
 const Editor = dynamic(() => import('../components/editor'), {
   ssr: false,
-  loading: () => <div className="flex h-full w-full items-center justify-center">Loading editor...</div>,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center">
+      Loading editor...
+    </div>
+  ),
 })
 
 interface Note {
@@ -37,7 +41,7 @@ export default function NotePage() {
 
   const fetchNote = useCallback(async () => {
     try {
-      const response = await fetch(`/api/notes/${noteId}`)
+      const response = await fetch(`/api/note/${noteId}`)
       if (!response.ok) {
         toast.error('Failed to fetch note')
         return
@@ -58,7 +62,7 @@ export default function NotePage() {
       if (!session?.user || !note) return
       setIsSaving(true)
       try {
-        const response = await fetch(`/api/notes/${note.id}`, {
+        const response = await fetch(`/api/note/${note.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -96,12 +100,21 @@ export default function NotePage() {
   }
 
   if (!note) {
-    return <div className="flex h-full w-full items-center justify-center">Note not found</div>
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        Note not found
+      </div>
+    )
   }
 
   return (
     <div className="flex-1">
-      <Editor note={note} collaborators={collaborators} isSaving={isSaving} onSaveAction={saveNote} />
+      <Editor
+        note={note}
+        collaborators={collaborators}
+        isSaving={isSaving}
+        onSaveAction={saveNote}
+      />
     </div>
   )
 }

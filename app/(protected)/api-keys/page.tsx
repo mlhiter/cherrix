@@ -4,7 +4,12 @@ import { Plus } from 'lucide-react'
 import { ApiKey } from '@prisma/client'
 import { useState, useEffect } from 'react'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { ApiKeyList } from '@/components/api-keys/api-key-list'
 import { ApiKeyForm } from '@/components/api-keys/api-key-form'
@@ -17,7 +22,7 @@ export default function ApiKeysPage() {
 
   const fetchApiKeys = async () => {
     try {
-      const response = await fetch('/api/api-keys')
+      const response = await fetch('/api/api-key')
       if (!response.ok) throw new Error('Failed to fetch API keys')
       const data = await response.json()
       setApiKeys(data.apiKeys)
@@ -43,7 +48,11 @@ export default function ApiKeysPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <ApiKeyList fetchApiKeys={fetchApiKeys} apiKeys={apiKeys} isLoading={isLoading} />
+          <ApiKeyList
+            fetchApiKeys={fetchApiKeys}
+            apiKeys={apiKeys}
+            isLoading={isLoading}
+          />
         </CardContent>
       </Card>
 

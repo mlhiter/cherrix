@@ -24,7 +24,7 @@ export default function ChatPage() {
   useEffect(() => {
     const fetchInitialMessages = async () => {
       try {
-        const response = await fetch(`/api/chats/${chatId}/messages`)
+        const response = await fetch(`/api/chat/${chatId}/message`)
         if (!response.ok) {
           throw new Error('Failed to fetch messages')
         }
@@ -40,9 +40,9 @@ export default function ChatPage() {
   const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     maxSteps: 10,
     initialMessages,
-    api: `/api/chats/${chatId}/messages`,
+    api: `/api/chat/${chatId}/message`,
     onFinish: async (message) => {
-      const response = await fetch(`/api/chats/${chatId}/messages`, {
+      const response = await fetch(`/api/chat/${chatId}/message`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -128,9 +128,17 @@ export default function ChatPage() {
                 <Button
                   type="submit"
                   className="h-10 w-10 rounded-full p-0 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95"
-                  disabled={!input.trim() || status === 'submitted' || status === 'streaming'}
+                  disabled={
+                    !input.trim() ||
+                    status === 'submitted' ||
+                    status === 'streaming'
+                  }
                   aria-label="Send Message">
-                  {status === 'error' ? <AlertCircle className="h-5 w-5" /> : <PaperPlaneIcon className="h-5 w-5" />}
+                  {status === 'error' ? (
+                    <AlertCircle className="h-5 w-5" />
+                  ) : (
+                    <PaperPlaneIcon className="h-5 w-5" />
+                  )}
                   <span className="sr-only">Send Message</span>
                 </Button>
               </form>

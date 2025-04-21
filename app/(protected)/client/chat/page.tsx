@@ -38,7 +38,7 @@ export default function ChatPage() {
       try {
         setIsLoading(true)
         // First, try to get existing chats
-        const response = await fetch('/api/chats')
+        const response = await fetch('/api/chat')
 
         if (!response.ok) {
           toast.error('Failed to fetch chats')
@@ -52,7 +52,7 @@ export default function ChatPage() {
           router.push(`/client/chat/${chats[0].id}`)
         } else {
           // If no chats exist, create a new one
-          const createResponse = await fetch('/api/chats', {
+          const createResponse = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -68,7 +68,9 @@ export default function ChatPage() {
           }
 
           const data = await createResponse.json()
-          window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'chat' } }))
+          window.dispatchEvent(
+            new CustomEvent('resource-updated', { detail: { type: 'chat' } })
+          )
           router.push(`/client/chat/${data.id}`)
         }
       } catch (error) {
@@ -84,7 +86,7 @@ export default function ChatPage() {
 
   const handleCreateChat = async () => {
     try {
-      const response = await fetch('/api/chats', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +103,9 @@ export default function ChatPage() {
 
       const chat = await response.json()
       // 触发资源列表更新事件
-      window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'chat' } }))
+      window.dispatchEvent(
+        new CustomEvent('resource-updated', { detail: { type: 'chat' } })
+      )
       router.push(`/client/chat/${chat.id}`)
     } catch (error) {
       console.error('Error creating chat:', error)
@@ -137,7 +141,9 @@ export default function ChatPage() {
               onClick={() => router.push(`/client/chat/${chat.id}`)}>
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{chat.title}</h3>
-                <span className="text-sm text-muted-foreground">{new Date(chat.updatedAt).toLocaleDateString()}</span>
+                <span className="text-sm text-muted-foreground">
+                  {new Date(chat.updatedAt).toLocaleDateString()}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">

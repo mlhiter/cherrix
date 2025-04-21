@@ -14,7 +14,7 @@ export default function NotebookPage() {
       try {
         setIsLoading(true)
         // First, try to get existing notes
-        const response = await fetch('/api/notes')
+        const response = await fetch('/api/note')
 
         if (!response.ok) {
           toast.error('Failed to fetch notes')
@@ -28,7 +28,7 @@ export default function NotebookPage() {
           router.push(`/client/notebook/${notes[0].id}`)
         } else {
           // If no notes exist, create a new one
-          const createResponse = await fetch('/api/notes', {
+          const createResponse = await fetch('/api/note', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -50,7 +50,9 @@ export default function NotebookPage() {
           }
 
           const data = await createResponse.json()
-          window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'note' } }))
+          window.dispatchEvent(
+            new CustomEvent('resource-updated', { detail: { type: 'note' } })
+          )
           router.push(`/client/notebook/${data.id}`)
         }
       } catch (error) {

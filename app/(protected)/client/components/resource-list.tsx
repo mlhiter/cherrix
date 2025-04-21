@@ -22,7 +22,7 @@ const useResources = (type: ResourceType) => {
   useEffect(() => {
     const fetchResources = async () => {
       try {
-        const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+        const endpoint = type === 'note' ? '/api/note' : '/api/chat'
         const response = await fetch(endpoint)
         if (!response.ok) throw new Error(`Failed to fetch ${type}s`)
         const data = await response.json()
@@ -42,15 +42,21 @@ const useResources = (type: ResourceType) => {
       }
     }
 
-    window.addEventListener('resource-updated', handleResourceUpdate as EventListener)
+    window.addEventListener(
+      'resource-updated',
+      handleResourceUpdate as EventListener
+    )
     return () => {
-      window.removeEventListener('resource-updated', handleResourceUpdate as EventListener)
+      window.removeEventListener(
+        'resource-updated',
+        handleResourceUpdate as EventListener
+      )
     }
   }, [type])
 
   const handleDelete = async (id: string) => {
     try {
-      const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+      const endpoint = type === 'note' ? '/api/note' : '/api/chat'
       const response = await fetch(`${endpoint}/${id}`, {
         method: 'DELETE',
       })
@@ -70,7 +76,7 @@ const useResources = (type: ResourceType) => {
 
   const handleCreate = async (title: string) => {
     try {
-      const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+      const endpoint = type === 'note' ? '/api/note' : '/api/chat'
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -103,7 +109,7 @@ const useResources = (type: ResourceType) => {
 
   const handleRename = async (id: string, newTitle: string) => {
     try {
-      const endpoint = type === 'note' ? '/api/notes' : '/api/chats'
+      const endpoint = type === 'note' ? '/api/note' : '/api/chat'
       const response = await fetch(`${endpoint}/${id}`, {
         method: 'PATCH',
         headers: {
@@ -112,7 +118,11 @@ const useResources = (type: ResourceType) => {
         body: JSON.stringify({ title: newTitle }),
       })
       if (!response.ok) throw new Error(`Failed to rename ${type}`)
-      setResources(resources.map((resource) => (resource.id === id ? { ...resource, title: newTitle } : resource)))
+      setResources(
+        resources.map((resource) =>
+          resource.id === id ? { ...resource, title: newTitle } : resource
+        )
+      )
     } catch (error) {
       console.error(`Error renaming ${type}:`, error)
     }
@@ -133,8 +143,11 @@ export const ResourceList = () => {
   const [newTitle, setNewTitle] = useState('')
   const [isCreating, setIsCreating] = useState(false)
 
-  const resourceType: ResourceType = pathname.includes('/notebook') ? 'note' : 'chat'
-  const { resources, isLoading, handleDelete, handleCreate, handleRename } = useResources(resourceType)
+  const resourceType: ResourceType = pathname.includes('/notebook')
+    ? 'note'
+    : 'chat'
+  const { resources, isLoading, handleDelete, handleCreate, handleRename } =
+    useResources(resourceType)
 
   const getListTitle = () => {
     if (pathname.includes('/notebook')) return 'Notes'
@@ -149,7 +162,8 @@ export const ResourceList = () => {
     if (newResource) {
       setNewTitle('')
       setIsCreating(false)
-      const basePath = resourceType === 'note' ? '/client/notebook' : '/client/chat'
+      const basePath =
+        resourceType === 'note' ? '/client/notebook' : '/client/chat'
       router.push(`${basePath}/${newResource.id}`)
     }
   }
@@ -158,11 +172,18 @@ export const ResourceList = () => {
     <div className="h-full w-full rounded-sm border-gray-200 p-2">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <Button variant="outline" disabled className="border-none bg-transparent shadow-none">
+          <Button
+            variant="outline"
+            disabled
+            className="border-none bg-transparent shadow-none">
             <Pin className="mr-2 h-4 w-4" />
             {getListTitle()}
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsCreating(true)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsCreating(true)}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -175,7 +196,10 @@ export const ResourceList = () => {
               placeholder="Enter title..."
               className="h-8"
             />
-            <Button variant="outline" className="h-8" onClick={handleCreateSubmit}>
+            <Button
+              variant="outline"
+              className="h-8"
+              onClick={handleCreateSubmit}>
               Create
             </Button>
           </div>
