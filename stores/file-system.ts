@@ -15,20 +15,11 @@ interface FileSystemState {
   isLoading: boolean
   error: string | null
   buildFileTree: (webcontainerInstance: WebContainer | null) => Promise<void>
-  loadFile: (
-    webcontainerInstance: WebContainer | null,
-    path: string
-  ) => Promise<void>
-  saveFile: (
-    webcontainerInstance: WebContainer | null,
-    content: string
-  ) => Promise<void>
+  loadFile: (webcontainerInstance: WebContainer | null, path: string) => Promise<void>
+  saveFile: (webcontainerInstance: WebContainer | null, content: string) => Promise<void>
 }
 
-const buildFileTree = async (
-  path: string = '.',
-  webcontainerInstance: WebContainer | null
-): Promise<FileNode[]> => {
+const buildFileTree = async (path: string = '.', webcontainerInstance: WebContainer | null): Promise<FileNode[]> => {
   if (!webcontainerInstance) return []
 
   try {

@@ -15,9 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ label }) => {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-y-4">
       <h1 className={cn('text-3xl font-bold', font.className)}>🔐 Auth</h1>
-      <p className={cn('text-sm text-muted-foreground', font.className)}>
-        {label}
-      </p>
+      <p className={cn('text-sm text-muted-foreground', font.className)}>{label}</p>
     </div>
   )
 }

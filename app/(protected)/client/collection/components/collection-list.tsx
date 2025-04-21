@@ -1,14 +1,7 @@
 import { formatDistanceToNow } from 'date-fns'
 import { Eye, Trash, RefreshCw, Loader2, Boxes } from 'lucide-react'
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/empty-state'
 import { Card } from '@/components/ui/card'
@@ -23,13 +16,7 @@ interface CollectionListProps {
   isLoading?: boolean
 }
 
-export function CollectionList({
-  items,
-  onView,
-  onDelete,
-  onSync,
-  isLoading = false,
-}: CollectionListProps) {
+export function CollectionList({ items, onView, onDelete, onSync, isLoading = false }: CollectionListProps) {
   return (
     <Card className="flex-1 p-4">
       <div className="flex min-h-10 items-center justify-between">
@@ -61,10 +48,7 @@ export function CollectionList({
             </TableHeader>
             <TableBody>
               {items.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => onView(item)}>
+                <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50" onClick={() => onView(item)}>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>
                     {item.sourceType === 'OFFICIAL_DOC'
@@ -89,28 +73,14 @@ export function CollectionList({
                     })}
                   </TableCell>
                   <TableCell>{item.syncFrequency}</TableCell>
-                  <TableCell
-                    className="space-x-2"
-                    onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onView(item)}
-                      title="View">
+                  <TableCell className="space-x-2" onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" onClick={() => onView(item)} title="View">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onSync(item.id)}
-                      title="Sync Now">
+                    <Button variant="ghost" size="icon" onClick={() => onSync(item.id)} title="Sync Now">
                       <RefreshCw className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDelete(item.id)}
-                      title="Delete">
+                    <Button variant="ghost" size="icon" onClick={() => onDelete(item.id)} title="Delete">
                       <Trash className="h-4 w-4" />
                     </Button>
                   </TableCell>

@@ -2,11 +2,7 @@ import pdf from 'pdf-parse'
 
 import { NextResponse } from 'next/server'
 
-import {
-  addDocumentsToVectorStore,
-  similaritySearch,
-  getCollectionStats,
-} from '@/lib/vector-store'
+import { addDocumentsToVectorStore, similaritySearch, getCollectionStats } from '@/lib/vector-store'
 import { minioClient } from '@/lib/minio'
 import { processDocument } from '@/lib/document-processor'
 
@@ -15,16 +11,10 @@ export async function POST(req: Request) {
     const { filePath, fileName, fileType } = await req.json()
 
     if (!filePath) {
-      return NextResponse.json(
-        { error: 'No file path provided' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'No file path provided' }, { status: 400 })
     }
 
-    const dataStream = await minioClient.getObject(
-      process.env.MINIO_BUCKET_NAME!,
-      filePath
-    )
+    const dataStream = await minioClient.getObject(process.env.MINIO_BUCKET_NAME!, filePath)
 
     const chunks: Buffer[] = []
     for await (const chunk of dataStream) {
@@ -50,10 +40,7 @@ export async function POST(req: Request) {
     })
   } catch (error) {
     console.error('Error vectorizing document:', error)
-    return NextResponse.json(
-      { error: 'Failed to vectorize document' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to vectorize document' }, { status: 500 })
   }
 }
 
@@ -72,9 +59,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ results })
   } catch (error) {
     console.error('Error searching documents:', error)
-    return NextResponse.json(
-      { error: 'Failed to search documents' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to search documents' }, { status: 500 })
   }
 }

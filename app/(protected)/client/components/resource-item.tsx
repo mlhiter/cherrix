@@ -1,10 +1,4 @@
-import {
-  LucideIcon,
-  MessageCircle,
-  Notebook,
-  Trash,
-  Pencil,
-} from 'lucide-react'
+import { LucideIcon, MessageCircle, Notebook, Trash, Pencil } from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -28,12 +22,7 @@ const RESOURCE_ICONS: Record<string, LucideIcon> = {
   chat: MessageCircle,
 }
 
-export const ResourceItem = ({
-  item,
-  type,
-  onDelete,
-  onRename,
-}: ResourceItemProps) => {
+export const ResourceItem = ({ item, type, onDelete, onRename }: ResourceItemProps) => {
   const Icon = RESOURCE_ICONS[type]
   const router = useRouter()
   const [isEditing, setIsEditing] = useState(false)

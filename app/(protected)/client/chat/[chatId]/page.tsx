@@ -128,17 +128,9 @@ export default function ChatPage() {
                 <Button
                   type="submit"
                   className="h-10 w-10 rounded-full p-0 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95"
-                  disabled={
-                    !input.trim() ||
-                    status === 'submitted' ||
-                    status === 'streaming'
-                  }
+                  disabled={!input.trim() || status === 'submitted' || status === 'streaming'}
                   aria-label="Send Message">
-                  {status === 'error' ? (
-                    <AlertCircle className="h-5 w-5" />
-                  ) : (
-                    <PaperPlaneIcon className="h-5 w-5" />
-                  )}
+                  {status === 'error' ? <AlertCircle className="h-5 w-5" /> : <PaperPlaneIcon className="h-5 w-5" />}
                   <span className="sr-only">Send Message</span>
                 </Button>
               </form>

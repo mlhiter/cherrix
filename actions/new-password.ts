@@ -6,10 +6,7 @@ import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
 import { NewPasswordSchema } from '@/schemas'
 
-export const newPassword = async (
-  values: z.infer<typeof NewPasswordSchema>,
-  token: string | null
-) => {
+export const newPassword = async (values: z.infer<typeof NewPasswordSchema>, token: string | null) => {
   if (!token) {
     return {
       error: 'Missing token',

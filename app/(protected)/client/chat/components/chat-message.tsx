@@ -20,14 +20,8 @@ export function ChatMessage({ content, timestamp, role }: ChatMessageProps) {
     return (
       <div className="flex items-start justify-end gap-2">
         <div>
-          <div className="rounded-lg bg-primary/90 p-3 text-primary-foreground">
-            {content}
-          </div>
-          {timestamp && (
-            <div className="mt-1 text-right text-xs opacity-70">
-              {timestamp}
-            </div>
-          )}
+          <div className="rounded-lg bg-primary/90 p-3 text-primary-foreground">{content}</div>
+          {timestamp && <div className="mt-1 text-right text-xs opacity-70">{timestamp}</div>}
         </div>
 
         <Avatar>
@@ -44,17 +38,11 @@ export function ChatMessage({ content, timestamp, role }: ChatMessageProps) {
     <div className="flex items-start gap-2">
       <Avatar>
         <AvatarImage src={''} />
-        <AvatarFallback className="bg-accent text-accent-foreground">
-          🍒
-        </AvatarFallback>
+        <AvatarFallback className="bg-accent text-accent-foreground">🍒</AvatarFallback>
       </Avatar>
       <div>
-        <div className="rounded-lg bg-muted p-3 text-muted-foreground">
-          {content}
-        </div>
-        {timestamp && (
-          <div className="mt-1 text-xs opacity-70">{timestamp}</div>
-        )}
+        <div className="rounded-lg bg-muted p-3 text-muted-foreground">{content}</div>
+        {timestamp && <div className="mt-1 text-xs opacity-70">{timestamp}</div>}
       </div>
     </div>
   )

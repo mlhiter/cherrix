@@ -11,11 +11,7 @@ interface LoginButtonProps {
   asChild?: boolean
 }
 
-export const LoginButton: React.FC<LoginButtonProps> = ({
-  children,
-  mode = 'redirect',
-  asChild = false,
-}) => {
+export const LoginButton: React.FC<LoginButtonProps> = ({ children, mode = 'redirect', asChild = false }) => {
   const router = useRouter()
 
   const onClick = () => {

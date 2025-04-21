@@ -8,14 +8,7 @@ import { useSearchParams } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FieldErrors, useForm } from 'react-hook-form'
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { LoginSchema } from '@/schemas'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -81,9 +74,7 @@ export const LoginForm = () => {
       backButtonHref="/auth/register"
       showSocial>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, onError)}
-          className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
           {showTwoFactor && (
             <div className="space-y-4">
               <FormField
@@ -93,12 +84,7 @@ export const LoginForm = () => {
                   <FormItem>
                     <FormLabel>Two Factor Code</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="123456"
-                        type="text"
-                        disabled={isPending}
-                      />
+                      <Input {...field} placeholder="123456" type="text" disabled={isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -116,13 +102,7 @@ export const LoginForm = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="Email"
-                          type="email"
-                          autoComplete="email"
-                          disabled={isPending}
-                        />
+                        <Input {...field} placeholder="Email" type="email" autoComplete="email" disabled={isPending} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -150,11 +130,7 @@ export const LoginForm = () => {
                   )}
                 />
               </div>
-              <Button
-                size="sm"
-                variant="link"
-                asChild
-                className="px-0 font-normal">
+              <Button size="sm" variant="link" asChild className="px-0 font-normal">
                 <Link href="/auth/reset">Forgot password?</Link>
               </Button>
             </>

@@ -4,12 +4,7 @@ import Link from 'next/link'
 import { FaUser } from 'react-icons/fa'
 import { LogOutIcon, SettingsIcon } from 'lucide-react'
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 import { useCurrentUser } from '@/hooks/use-current-user'

@@ -11,10 +11,7 @@ import { similaritySearch } from '@/lib/vector-store'
 export const maxDuration = 30
 
 // get all messages for a chat
-export async function GET(
-  req: Request,
-  { params }: { params: { chatId: string } }
-) {
+export async function GET(req: Request, { params }: { params: { chatId: string } }) {
   try {
     const { chatId } = await params
     const session = await auth()
@@ -26,10 +23,7 @@ export async function GET(
       where: {
         chatId,
         chat: {
-          OR: [
-            { userId: session.user.id },
-            { collaborators: { some: { id: session.user.id } } },
-          ],
+          OR: [{ userId: session.user.id }, { collaborators: { some: { id: session.user.id } } }],
         },
       },
       orderBy: {
@@ -45,18 +39,12 @@ export async function GET(
 }
 
 // interact with the ai and store last message to database
-export async function POST(
-  req: Request,
-  { params }: { params: { chatId: string } }
-) {
+export async function POST(req: Request, { params }: { params: { chatId: string } }) {
   try {
     const { chatId } = await params
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const { messages } = await req.json()
@@ -80,9 +68,7 @@ export async function POST(
     // TODO: The context needs to be more focused; the current context is too scattered.
     if (lastUserMessage) {
       const searchResults = await similaritySearch(lastUserMessage.content)
-      context = searchResults
-        .map((doc, index) => `[${index + 1}] ${doc.pageContent}`)
-        .join('\n\n')
+      context = searchResults.map((doc, index) => `[${index + 1}] ${doc.pageContent}`).join('\n\n')
     }
 
     let apiKeyConfig
@@ -102,10 +88,7 @@ export async function POST(
       })
 
       if (!apiKey) {
-        return NextResponse.json(
-          { success: false, error: 'No active API key found' },
-          { status: 400 }
-        )
+        return NextResponse.json({ success: false, error: 'No active API key found' }, { status: 400 })
       }
 
       apiKeyConfig = {
@@ -129,25 +112,16 @@ export async function POST(
     return result.toDataStreamResponse()
   } catch (error) {
     console.error('Error creating message:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }
 }
 
 // add a new message to database
-export async function PATCH(
-  req: Request,
-  { params }: { params: { chatId: string } }
-) {
+export async function PATCH(req: Request, { params }: { params: { chatId: string } }) {
   const { chatId } = await params
   const session = await auth()
   if (!session?.user) {
-    return NextResponse.json(
-      { success: false, error: 'Unauthorized' },
-      { status: 401 }
-    )
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
   const { content, role } = await req.json()

@@ -25,9 +25,7 @@ export const PdfRender = ({ filePath }: { filePath: string }) => {
 
   useEffect(() => {
     const getPresignedUrl = async () => {
-      const response = await fetch(
-        `/api/document/presigned-url?filePath=${encodeURIComponent(filePath)}`
-      )
+      const response = await fetch(`/api/document/presigned-url?filePath=${encodeURIComponent(filePath)}`)
 
       const data = await response.json()
       console.log(data)
@@ -47,13 +45,7 @@ export const PdfRender = ({ filePath }: { filePath: string }) => {
             <p>Loading PDF...</p>
           </div>
         }>
-        <Page
-          pageNumber={pageNumber}
-          width={400}
-          height={500}
-          renderTextLayer={false}
-          renderAnnotationLayer={false}
-        />
+        <Page pageNumber={pageNumber} width={400} height={500} renderTextLayer={false} renderAnnotationLayer={false} />
       </Document>
       <div className="mt-6 flex items-center justify-center gap-6">
         <button

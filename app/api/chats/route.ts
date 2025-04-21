@@ -7,18 +7,12 @@ export async function GET() {
   try {
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const chats = await db.chat.findMany({
       where: {
-        OR: [
-          { userId: session.user.id },
-          { collaborators: { some: { id: session.user.id } } },
-        ],
+        OR: [{ userId: session.user.id }, { collaborators: { some: { id: session.user.id } } }],
       },
       include: {
         user: {
@@ -44,10 +38,7 @@ export async function GET() {
     return NextResponse.json(chats)
   } catch (error) {
     console.error('Error fetching chats:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }
 }
 
@@ -56,10 +47,7 @@ export async function POST(req: Request) {
   try {
     const session = await auth()
     if (!session?.user || !session.user.id) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const { title, isPublic, collaborators, messages } = await req.json()
@@ -101,9 +89,6 @@ export async function POST(req: Request) {
   } catch (error) {
     console.log('error', error)
     console.error('Error creating chat:', error)
-    return NextResponse.json(
-      { success: false, error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }
 }

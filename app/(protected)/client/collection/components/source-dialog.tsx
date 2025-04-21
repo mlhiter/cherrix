@@ -1,20 +1,8 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -27,12 +15,7 @@ interface SourceDialogProps {
   onSubmit: (data: { name: string; url: string; syncFrequency: string }) => void
 }
 
-export function SourceDialog({
-  source,
-  open,
-  onOpenChange,
-  onSubmit,
-}: SourceDialogProps) {
+export function SourceDialog({ source, open, onOpenChange, onSubmit }: SourceDialogProps) {
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
   const [syncFrequency, setSyncFrequency] = useState('every-day')
@@ -99,9 +82,7 @@ export function SourceDialog({
 
           <div className="space-y-2">
             <Label htmlFor="frequency">Sync Frequency</Label>
-            <Select
-              value={syncFrequency}
-              onValueChange={(value) => setSyncFrequency(value)}>
+            <Select value={syncFrequency} onValueChange={(value) => setSyncFrequency(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Sync Frequency" />
               </SelectTrigger>

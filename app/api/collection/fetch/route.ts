@@ -23,10 +23,7 @@ async function fetchRssBlog(url: string) {
       title: item.title,
       url: item.link,
       content: item.content || item.contentSnippet,
-      publishDate:
-        item.pubDate || item.isoDate
-          ? new Date(item.pubDate || item.isoDate || '')
-          : null,
+      publishDate: item.pubDate || item.isoDate ? new Date(item.pubDate || item.isoDate || '') : null,
       author: item.creator || item.author,
       lastSyncTime: new Date(),
     }))

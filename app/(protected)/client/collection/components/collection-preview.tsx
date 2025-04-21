@@ -5,13 +5,7 @@ import { Loader2 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import { useEffect, useState } from 'react'
 
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { CollectionItem, BlogItem } from '@/types/collection'
 import { BlogDetailDialog } from './blog-detail-dialog'
 
@@ -21,17 +15,10 @@ interface CollectionPreviewProps {
   selectedItem: CollectionItem | null
 }
 
-export const CollectionPreview = ({
-  drawerOpen,
-  setDrawerOpenAction,
-  selectedItem,
-}: CollectionPreviewProps) => {
-  const [collectionWithItems, setCollectionWithItems] =
-    useState<CollectionItem | null>(null)
+export const CollectionPreview = ({ drawerOpen, setDrawerOpenAction, selectedItem }: CollectionPreviewProps) => {
+  const [collectionWithItems, setCollectionWithItems] = useState<CollectionItem | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedBlogItem, setSelectedBlogItem] = useState<BlogItem | null>(
-    null
-  )
+  const [selectedBlogItem, setSelectedBlogItem] = useState<BlogItem | null>(null)
   const [isBlogDetailOpen, setIsBlogDetailOpen] = useState(false)
 
   useEffect(() => {
@@ -66,10 +53,7 @@ export const CollectionPreview = ({
 
   return (
     <>
-      <Drawer
-        direction="right"
-        open={drawerOpen}
-        onOpenChange={setDrawerOpenAction}>
+      <Drawer direction="right" open={drawerOpen} onOpenChange={setDrawerOpenAction}>
         <DrawerContent className="h-full">
           <div className="flex h-full flex-col">
             <DrawerHeader>
@@ -84,9 +68,7 @@ export const CollectionPreview = ({
                 <div className="flex h-full items-center justify-center">
                   <div className="flex flex-col items-center gap-2">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">
-                      Loading collection items...
-                    </p>
+                    <p className="text-sm text-muted-foreground">Loading collection items...</p>
                   </div>
                 </div>
               ) : collectionWithItems ? (
@@ -119,9 +101,7 @@ export const CollectionPreview = ({
                               />
                             ),
                             code: ({ node, className, children, ...props }) => (
-                              <code
-                                className="rounded bg-muted px-[0.3em] py-[0.2em] text-sm"
-                                {...props}>
+                              <code className="rounded bg-muted px-[0.3em] py-[0.2em] text-sm" {...props}>
                                 {children}
                               </code>
                             ),
@@ -144,11 +124,7 @@ export const CollectionPreview = ({
         </DrawerContent>
       </Drawer>
 
-      <BlogDetailDialog
-        item={selectedBlogItem}
-        open={isBlogDetailOpen}
-        onOpenChange={setIsBlogDetailOpen}
-      />
+      <BlogDetailDialog item={selectedBlogItem} open={isBlogDetailOpen} onOpenChange={setIsBlogDetailOpen} />
     </>
   )
 }

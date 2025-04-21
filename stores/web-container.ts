@@ -1,12 +1,7 @@
 import { create } from 'zustand'
 import { WebContainer } from '@webcontainer/api'
 
-type WebContainerStatus =
-  | 'idle'
-  | 'installing'
-  | 'starting'
-  | 'running'
-  | 'error'
+type WebContainerStatus = 'idle' | 'installing' | 'starting' | 'running' | 'error'
 
 interface WebContainerState {
   instance: WebContainer | null

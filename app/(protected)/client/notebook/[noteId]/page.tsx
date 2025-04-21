@@ -9,11 +9,7 @@ import { useEffect, useState, useCallback } from 'react'
 
 const Editor = dynamic(() => import('../components/editor'), {
   ssr: false,
-  loading: () => (
-    <div className="flex h-full w-full items-center justify-center">
-      Loading editor...
-    </div>
-  ),
+  loading: () => <div className="flex h-full w-full items-center justify-center">Loading editor...</div>,
 })
 
 interface Note {
@@ -100,21 +96,12 @@ export default function NotePage() {
   }
 
   if (!note) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        Note not found
-      </div>
-    )
+    return <div className="flex h-full w-full items-center justify-center">Note not found</div>
   }
 
   return (
     <div className="flex-1">
-      <Editor
-        note={note}
-        collaborators={collaborators}
-        isSaving={isSaving}
-        onSaveAction={saveNote}
-      />
+      <Editor note={note} collaborators={collaborators} isSaving={isSaving} onSaveAction={saveNote} />
     </div>
   )
 }

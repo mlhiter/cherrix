@@ -2,12 +2,7 @@ import { toast } from 'sonner'
 import { useState } from 'react'
 import { Loader2, Database } from 'lucide-react'
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 
 import { MyDocument } from '@/types/document'
@@ -72,13 +67,7 @@ export function DocumentVectorize({ document }: DocumentVectorizeProps) {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>
-            {isVectorizing
-              ? 'Vectorizing...'
-              : isVectorized
-                ? 'Document vectorized'
-                : 'Vectorize document'}
-          </p>
+          <p>{isVectorizing ? 'Vectorizing...' : isVectorized ? 'Document vectorized' : 'Vectorize document'}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

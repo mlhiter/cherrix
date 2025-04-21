@@ -21,34 +21,29 @@ export interface EditorRef {
   loadFile: (path: string) => Promise<void>
 }
 
-export const CodeEditor = forwardRef<EditorRef, EditorProps>(
-  ({ webcontainerInstance }, ref) => {
-    const { currentFile, fileContent, loadFile, saveFile } =
-      useFileSystemStore()
+export const CodeEditor = forwardRef<EditorRef, EditorProps>(({ webcontainerInstance }, ref) => {
+  const { currentFile, fileContent, loadFile, saveFile } = useFileSystemStore()
 
-    useImperativeHandle(ref, () => ({
-      loadFile: (path: string) => loadFile(webcontainerInstance, path),
-    }))
+  useImperativeHandle(ref, () => ({
+    loadFile: (path: string) => loadFile(webcontainerInstance, path),
+  }))
 
-    const handleEditorWillMount = async (monaco: any) => {
-      if (!webcontainerInstance) return
+  const handleEditorWillMount = async (monaco: any) => {
+    if (!webcontainerInstance) return
 
-      try {
-        const tsconfigContent = await webcontainerInstance.fs.readFile(
-          'tsconfig.json',
-          'utf-8'
-        )
-        const tsconfig = JSON.parse(tsconfigContent)
+    try {
+      const tsconfigContent = await webcontainerInstance.fs.readFile('tsconfig.json', 'utf-8')
+      const tsconfig = JSON.parse(tsconfigContent)
 
-        // FIXME： opening ts file will cause moduleResolution bug
-        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-          ...tsconfig.compilerOptions,
-          allowNonTsExtensions: true,
-          isolatedModules: true,
-        })
+      // FIXME： opening ts file will cause moduleResolution bug
+      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+        ...tsconfig.compilerOptions,
+        allowNonTsExtensions: true,
+        isolatedModules: true,
+      })
 
-        monaco.languages.typescript.typescriptDefaults.addExtraLib(
-          `declare module 'next/font/google' {
+      monaco.languages.typescript.typescriptDefaults.addExtraLib(
+        `declare module 'next/font/google' {
             interface FontOptions {
               weight?: string | number | Array<string | number>;
               style?: string;
@@ -59,42 +54,39 @@ export const CodeEditor = forwardRef<EditorRef, EditorProps>(
               style: { fontFamily: string };
             };
           }`,
-          'next-types.d.ts'
-        )
-      } catch (error) {
-        console.error('Failed to configure TypeScript:', error)
-      }
+        'next-types.d.ts'
+      )
+    } catch (error) {
+      console.error('Failed to configure TypeScript:', error)
     }
-
-    return (
-      <div className="flex h-full flex-col">
-        <div className="mb-2 rounded-md rounded-b-none border-b border-gray-200 bg-gray-100 p-2 text-sm font-medium">
-          <div className="text-sm font-medium">
-            {currentFile || 'Select a file'}
-          </div>
-        </div>
-
-        <div className="flex-1">
-          {currentFile ? (
-            <MonacoEditor
-              height="100%"
-              language={getLanguageFromFileName(currentFile)}
-              value={fileContent}
-              onChange={(value) => saveFile(webcontainerInstance, value || '')}
-              theme="vs"
-              beforeMount={handleEditorWillMount}
-              options={MONACO_EDITOR_CONFIG}
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center px-4 text-gray-500">
-              Please select a file from the file browser first.
-            </div>
-          )}
-        </div>
-      </div>
-    )
   }
-)
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="mb-2 rounded-md rounded-b-none border-b border-gray-200 bg-gray-100 p-2 text-sm font-medium">
+        <div className="text-sm font-medium">{currentFile || 'Select a file'}</div>
+      </div>
+
+      <div className="flex-1">
+        {currentFile ? (
+          <MonacoEditor
+            height="100%"
+            language={getLanguageFromFileName(currentFile)}
+            value={fileContent}
+            onChange={(value) => saveFile(webcontainerInstance, value || '')}
+            theme="vs"
+            beforeMount={handleEditorWillMount}
+            options={MONACO_EDITOR_CONFIG}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center px-4 text-gray-500">
+            Please select a file from the file browser first.
+          </div>
+        )}
+      </div>
+    </div>
+  )
+})
 
 CodeEditor.displayName = 'CodeEditor'
 

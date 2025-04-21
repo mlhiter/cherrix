@@ -22,10 +22,7 @@ export async function POST(req: Request) {
     const session = await auth()
 
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
 
     const userId = session.user.id
@@ -35,10 +32,7 @@ export async function POST(req: Request) {
     const bucketReady = await ensureBucketExists(bucketName)
 
     if (!bucketReady) {
-      return NextResponse.json(
-        { error: 'Bucket not found', details: 'Bucket not found' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Bucket not found', details: 'Bucket not found' }, { status: 500 })
     }
 
     const formData = await req.formData()
@@ -54,11 +48,7 @@ export async function POST(req: Request) {
     const objectKey = `${normalizedFolderPath}${fileName}`
 
     try {
-      const result = await minioClient.putObject(
-        bucketName,
-        objectKey,
-        fileStream
-      )
+      const result = await minioClient.putObject(bucketName, objectKey, fileStream)
 
       const endPoint = process.env.MINIO_ENDPOINT as string
       const fileUrl = `https://${endPoint}/${bucketName}/${objectKey}`
@@ -95,10 +85,7 @@ export async function POST(req: Request) {
         path: objectKey,
       })
     } catch (uploadError) {
-      return NextResponse.json(
-        { error: 'upload failed', details: (uploadError as Error).message },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'upload failed', details: (uploadError as Error).message }, { status: 500 })
     }
   } catch (error) {
     return NextResponse.json(

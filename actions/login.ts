@@ -7,19 +7,13 @@ import { signIn } from '@/auth'
 import { LoginSchema } from '@/schemas'
 import { getUserByEmail } from '@/data/user'
 import { DEFAULT_REDIRECT_URL } from '@/routes'
-import {
-  sendVerificationEmail,
-  sendTwoFactorConfirmationEmail,
-} from '@/lib/mail'
+import { sendVerificationEmail, sendTwoFactorConfirmationEmail } from '@/lib/mail'
 import { generateVerificationToken, generateTwoFactorToken } from '@/lib/tokens'
 import { getTwoFactorTokenByEmail } from '@/data/two-factor-token'
 import { db } from '@/lib/db'
 import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation'
 
-export const login = async (
-  values: z.infer<typeof LoginSchema>,
-  callbackUrl?: string | null
-) => {
+export const login = async (values: z.infer<typeof LoginSchema>, callbackUrl?: string | null) => {
   const validated = LoginSchema.safeParse(values)
 
   if (!validated.success) {
@@ -37,10 +31,7 @@ export const login = async (
   if (!existingUser.emailVerified) {
     const verificationToken = await generateVerificationToken(email)
 
-    await sendVerificationEmail(
-      verificationToken.email,
-      verificationToken.token
-    )
+    await sendVerificationEmail(verificationToken.email, verificationToken.token)
 
     return { success: 'Confirmation email sent!' }
   }
@@ -67,8 +58,7 @@ export const login = async (
         where: { id: twoFactorToken.id },
       })
 
-      const existingTwoFactorConfirmation =
-        await getTwoFactorConfirmationByUserId(existingUser.id)
+      const existingTwoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id)
 
       if (existingTwoFactorConfirmation) {
         await db.twoFactorConfirmation.delete({
@@ -82,10 +72,7 @@ export const login = async (
     } else {
       const twoFactorToken = await generateTwoFactorToken(existingUser.email)
 
-      await sendTwoFactorConfirmationEmail(
-        twoFactorToken.email,
-        twoFactorToken.token
-      )
+      await sendTwoFactorConfirmationEmail(twoFactorToken.email, twoFactorToken.token)
 
       return { twoFactor: true }
     }

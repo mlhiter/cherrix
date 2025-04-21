@@ -39,11 +39,7 @@ export async function getVectorStore() {
 }
 
 export async function addDocumentsToVectorStore(documents: Document[]) {
-  const store = await Chroma.fromDocuments(
-    documents,
-    embeddings,
-    collectionOptions
-  )
+  const store = await Chroma.fromDocuments(documents, embeddings, collectionOptions)
   return store
 }
 

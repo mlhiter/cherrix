@@ -3,27 +3,18 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 
-export async function GET(
-  req: Request,
-  { params }: { params: { noteId: string } }
-) {
+export async function GET(req: Request, { params }: { params: { noteId: string } }) {
   try {
     const session = await auth()
     const { noteId } = await params
 
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
     const note = await db.note.findUnique({
       where: {
         id: noteId,
-        OR: [
-          { userId: session.user.id },
-          { collaborators: { some: { id: session.user.id } } },
-        ],
+        OR: [{ userId: session.user.id }, { collaborators: { some: { id: session.user.id } } }],
       },
     })
 
@@ -46,18 +37,12 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { noteId: string } }
-) {
+export async function PATCH(req: Request, { params }: { params: { noteId: string } }) {
   try {
     const session = await auth()
     const { noteId } = await params
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
 
     const { title, content, isPublic, collaborators } = await req.json()
@@ -65,10 +50,7 @@ export async function PATCH(
     const note = await db.note.update({
       where: {
         id: noteId,
-        OR: [
-          { userId: session.user.id },
-          { collaborators: { some: { id: session.user.id } } },
-        ],
+        OR: [{ userId: session.user.id }, { collaborators: { some: { id: session.user.id } } }],
       },
       data: {
         title,
@@ -93,27 +75,18 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { noteId: string } }
-) {
+export async function DELETE(req: Request, { params }: { params: { noteId: string } }) {
   try {
     const session = await auth()
     const { noteId } = await params
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
 
     await db.note.delete({
       where: {
         id: noteId,
-        OR: [
-          { userId: session.user.id },
-          { collaborators: { some: { id: session.user.id } } },
-        ],
+        OR: [{ userId: session.user.id }, { collaborators: { some: { id: session.user.id } } }],
       },
     })
 

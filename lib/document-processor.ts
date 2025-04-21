@@ -30,10 +30,7 @@ export function processMetadata(fileName: string, fileType: string) {
   }
 }
 
-export function enrichDocumentsWithMetadata(
-  documents: Document[],
-  metadata: DocumentMetadata
-): Document[] {
+export function enrichDocumentsWithMetadata(documents: Document[], metadata: DocumentMetadata): Document[] {
   return documents.map((doc) => {
     return {
       ...doc,
@@ -45,11 +42,7 @@ export function enrichDocumentsWithMetadata(
   })
 }
 
-export async function processDocument(
-  text: string,
-  fileName: string,
-  fileType: string
-): Promise<Document[]> {
+export async function processDocument(text: string, fileName: string, fileType: string): Promise<Document[]> {
   const chunks = await splitTextIntoChunks(text)
 
   const metadata = processMetadata(fileName, fileType)

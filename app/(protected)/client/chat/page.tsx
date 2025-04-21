@@ -68,9 +68,7 @@ export default function ChatPage() {
           }
 
           const data = await createResponse.json()
-          window.dispatchEvent(
-            new CustomEvent('resource-updated', { detail: { type: 'chat' } })
-          )
+          window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'chat' } }))
           router.push(`/client/chat/${data.id}`)
         }
       } catch (error) {
@@ -103,9 +101,7 @@ export default function ChatPage() {
 
       const chat = await response.json()
       // 触发资源列表更新事件
-      window.dispatchEvent(
-        new CustomEvent('resource-updated', { detail: { type: 'chat' } })
-      )
+      window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'chat' } }))
       router.push(`/client/chat/${chat.id}`)
     } catch (error) {
       console.error('Error creating chat:', error)
@@ -141,9 +137,7 @@ export default function ChatPage() {
               onClick={() => router.push(`/client/chat/${chat.id}`)}>
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{chat.title}</h3>
-                <span className="text-sm text-muted-foreground">
-                  {new Date(chat.updatedAt).toLocaleDateString()}
-                </span>
+                <span className="text-sm text-muted-foreground">{new Date(chat.updatedAt).toLocaleDateString()}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">

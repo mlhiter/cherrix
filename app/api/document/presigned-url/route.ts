@@ -9,11 +9,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const presignedUrl = await minioClient.presignedGetObject(
-      process.env.MINIO_BUCKET_NAME!,
-      filePath,
-      60 * 60
-    )
+    const presignedUrl = await minioClient.presignedGetObject(process.env.MINIO_BUCKET_NAME!, filePath, 60 * 60)
 
     return new Response(JSON.stringify({ url: presignedUrl }), {
       headers: { 'Content-Type': 'application/json' },

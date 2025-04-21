@@ -3,13 +3,7 @@
 import { formatDate } from '@/lib/date'
 import { MyDocument } from '@/types/document'
 
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer'
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } from '@/components/ui/drawer'
 import { PdfRender } from './pdf-render'
 
 interface FilePreviewProps {
@@ -18,11 +12,7 @@ interface FilePreviewProps {
   selectedDocument: MyDocument | null
 }
 
-export const FilePreview = ({
-  drawerOpen,
-  setDrawerOpenAction,
-  selectedDocument,
-}: FilePreviewProps) => {
+export const FilePreview = ({ drawerOpen, setDrawerOpenAction, selectedDocument }: FilePreviewProps) => {
   const renderPreview = () => {
     if (!selectedDocument?.url) return null
 
@@ -38,16 +28,11 @@ export const FilePreview = ({
   }
 
   return (
-    <Drawer
-      direction="right"
-      open={drawerOpen}
-      onOpenChange={setDrawerOpenAction}>
+    <Drawer direction="right" open={drawerOpen} onOpenChange={setDrawerOpenAction}>
       <DrawerContent className="h-full">
         <div className="flex h-full flex-col">
           <DrawerHeader>
-            {selectedDocument && (
-              <DrawerTitle>{selectedDocument.name}</DrawerTitle>
-            )}
+            {selectedDocument && <DrawerTitle>{selectedDocument.name}</DrawerTitle>}
             <DrawerDescription>
               {selectedDocument &&
                 `Document Type: ${selectedDocument.type} | Import Time: ${selectedDocument.importTime ? formatDate(selectedDocument.importTime) : 'Unknown'}`}
@@ -56,9 +41,7 @@ export const FilePreview = ({
           <div className="flex-1 overflow-auto px-4">
             {selectedDocument && (
               <div className="flex flex-col gap-4">
-                <div className="rounded-md bg-gray-100 p-2 text-sm">
-                  {renderPreview()}
-                </div>
+                <div className="rounded-md bg-gray-100 p-2 text-sm">{renderPreview()}</div>
               </div>
             )}
           </div>

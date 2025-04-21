@@ -3,12 +3,7 @@ import { format } from 'date-fns'
 import rehypeRaw from 'rehype-raw'
 import ReactMarkdown from 'react-markdown'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BlogItem } from '@/types/collection'
 
 interface BlogDetailDialogProps {
@@ -17,11 +12,7 @@ interface BlogDetailDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-export const BlogDetailDialog = ({
-  item,
-  open,
-  onOpenChange,
-}: BlogDetailDialogProps) => {
+export const BlogDetailDialog = ({ item, open, onOpenChange }: BlogDetailDialogProps) => {
   if (!item) return null
 
   return (
@@ -31,12 +22,7 @@ export const BlogDetailDialog = ({
           <DialogTitle className="text-xl font-bold">{item.title}</DialogTitle>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             {item.author && <span>By {item.author}</span>}
-            {item.publishDate && (
-              <span>
-                Published on{' '}
-                {format(new Date(item.publishDate), 'MMMM d, yyyy')}
-              </span>
-            )}
+            {item.publishDate && <span>Published on {format(new Date(item.publishDate), 'MMMM d, yyyy')}</span>}
           </div>
         </DialogHeader>
         <div className="prose prose-sm dark:prose-invert max-w-none flex-1 overflow-y-auto">
@@ -48,9 +34,7 @@ export const BlogDetailDialog = ({
                 const alt = props.alt || 'Blog image'
 
                 const isRelativePath = !src.startsWith('http')
-                const imageUrl = isRelativePath
-                  ? new URL(src, item.url).toString()
-                  : src
+                const imageUrl = isRelativePath ? new URL(src, item.url).toString() : src
 
                 return (
                   <span className="my-4 block">
@@ -62,8 +46,7 @@ export const BlogDetailDialog = ({
                         className="object-cover"
                         unoptimized={true}
                         onError={(e) => {
-                          const container = (e.target as HTMLElement)
-                            .parentElement
+                          const container = (e.target as HTMLElement).parentElement
                           if (container) {
                             container.innerHTML = `
                               <span class="flex h-full w-full flex-col items-center justify-center gap-2 p-4 text-center">
@@ -79,32 +62,20 @@ export const BlogDetailDialog = ({
                       />
                     </span>
                     {alt && alt !== 'Blog image' && (
-                      <span className="mt-2 block text-center text-sm text-muted-foreground">
-                        {alt}
-                      </span>
+                      <span className="mt-2 block text-center text-sm text-muted-foreground">{alt}</span>
                     )}
                   </span>
                 )
               },
               a: ({ node, ...props }) => (
-                <a
-                  {...props}
-                  className="text-primary hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                />
+                <a {...props} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" />
               ),
               code: ({ node, className, children, ...props }) => {
                 const match = /language-(\w+)/.exec(className || '')
                 return match ? (
                   <div className="relative">
-                    <div className="absolute right-2 top-2 text-xs text-muted-foreground">
-                      {match[1]}
-                    </div>
-                    <code
-                      className={className}
-                      {...props}
-                      style={{ display: 'block', padding: '1rem' }}>
+                    <div className="absolute right-2 top-2 text-xs text-muted-foreground">{match[1]}</div>
+                    <code className={className} {...props} style={{ display: 'block', padding: '1rem' }}>
                       {children}
                     </code>
                   </div>

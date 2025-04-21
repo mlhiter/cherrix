@@ -1,27 +1,9 @@
-import {
-  EllipsisVerticalIcon,
-  ListCollapse,
-  Trash,
-  Loader2,
-  File,
-} from 'lucide-react'
+import { EllipsisVerticalIcon, ListCollapse, Trash, Loader2, File } from 'lucide-react'
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 import { formatDate } from '@/lib/date'
 import { MyDocument } from '@/types/document'
@@ -81,9 +63,7 @@ export const DocumentList = ({
                   }}>
                   <TableCell>{doc.name}</TableCell>
                   <TableCell>{doc.type}</TableCell>
-                  <TableCell>
-                    {doc.importTime ? formatDate(doc.importTime) : '-'}
-                  </TableCell>
+                  <TableCell>{doc.importTime ? formatDate(doc.importTime) : '-'}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <DocumentVectorize document={doc} />

@@ -10,8 +10,7 @@ interface TerminalProps {
 
 export function Terminal({ webcontainerInstance }: TerminalProps) {
   const terminalRef = useRef<HTMLDivElement>(null)
-  const { output, input, isInitialized, executeCommand, setInput } =
-    useTerminalStore()
+  const { output, input, isInitialized, executeCommand, setInput } = useTerminalStore()
 
   useEffect(() => {
     if (terminalRef.current) {
@@ -53,9 +52,7 @@ export function Terminal({ webcontainerInstance }: TerminalProps) {
       <div className="mb-2 rounded-md rounded-b-none border-b border-gray-200 bg-gray-100 p-2 text-sm font-medium">
         <span className="text-sm text-gray-500">Terminal</span>
       </div>
-      <div
-        ref={terminalRef}
-        className="flex-1 overflow-y-auto whitespace-pre-wrap bg-white p-4 font-mono text-sm">
+      <div ref={terminalRef} className="flex-1 overflow-y-auto whitespace-pre-wrap bg-white p-4 font-mono text-sm">
         {cleanAnsiEscapeSequences(output)}
       </div>
       <div className="flex items-center rounded-lg bg-gray-50 p-3">

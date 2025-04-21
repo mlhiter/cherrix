@@ -8,10 +8,7 @@ export async function GET() {
     const session = await auth()
 
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
 
     const userId = session.user.id
@@ -46,10 +43,7 @@ export async function DELETE(req: Request) {
     const session = await auth()
 
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
 
     const userId = session.user.id
@@ -57,10 +51,7 @@ export async function DELETE(req: Request) {
     const { documentId } = await req.json()
 
     if (!documentId) {
-      return NextResponse.json(
-        { error: 'Document ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Document ID is required' }, { status: 400 })
     }
 
     const document = await db.document.findUnique({

@@ -7,10 +7,7 @@ interface TerminalState {
   output: string
   input: string
   isInitialized: boolean
-  executeCommand: (
-    webcontainerInstance: WebContainer | null,
-    command: string
-  ) => Promise<void>
+  executeCommand: (webcontainerInstance: WebContainer | null, command: string) => Promise<void>
   setInput: (input: string) => void
   clearOutput: () => void
 }

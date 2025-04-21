@@ -9,10 +9,7 @@ export async function GET() {
   try {
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const collections = await db.collection.findMany({
@@ -23,10 +20,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, collections })
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch collections' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Failed to fetch collections' }, { status: 500 })
   }
 }
 
@@ -35,15 +29,11 @@ export async function POST(request: Request) {
   try {
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     // TODO: we need to zod validate the request body nad fetch
-    const { name, sourceType, originalUrl, syncFrequency, items } =
-      await request.json()
+    const { name, sourceType, originalUrl, syncFrequency, items } = await request.json()
 
     const newCollection = await db.collection.create({
       data: {
@@ -95,10 +85,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, collection: newCollection })
   } catch (error) {
     console.error('Failed to create collection', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to create collection' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Failed to create collection' }, { status: 500 })
   }
 }
 
@@ -107,10 +94,7 @@ export async function DELETE(request: Request) {
   try {
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const { id } = await request.json()
@@ -124,9 +108,6 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Failed to delete collection' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Failed to delete collection' }, { status: 500 })
   }
 }

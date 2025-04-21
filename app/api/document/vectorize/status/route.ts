@@ -6,10 +6,7 @@ export async function GET() {
     const stats = await getCollectionStats()
     return NextResponse.json(stats)
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to get vectorization status' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to get vectorization status' }, { status: 500 })
   }
 }
 
@@ -20,9 +17,6 @@ export async function DELETE() {
       message: 'Vector collection deleted successfully',
     })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to delete vector collection' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to delete vector collection' }, { status: 500 })
   }
 }

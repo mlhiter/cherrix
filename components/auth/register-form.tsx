@@ -6,14 +6,7 @@ import { CardWrapper } from './card-wrapper'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FieldErrors, useForm } from 'react-hook-form'
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { RegisterSchema } from '@/schemas'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -58,9 +51,7 @@ export const RegisterForm = () => {
       backButtonHref="/auth/login"
       showSocial>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, onError)}
-          className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -69,13 +60,7 @@ export const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Name"
-                      disabled={isPending}
-                      type="text"
-                      autoComplete="name"
-                    />
+                    <Input {...field} placeholder="Name" disabled={isPending} type="text" autoComplete="name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -90,13 +75,7 @@ export const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Email"
-                      type="email"
-                      autoComplete="email"
-                      disabled={isPending}
-                    />
+                    <Input {...field} placeholder="Email" type="email" autoComplete="email" disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

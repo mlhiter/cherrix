@@ -104,11 +104,7 @@ export const UploadMethod = ({ onUploadSuccess }: UploadMethodProps) => {
   return (
     <Card className="p-4">
       <div className="flex flex-col gap-4">
-        <Tabs
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          tabList={tabList}
-        />
+        <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabList={tabList} />
 
         <div className="mt-4">
           {activeTab === 'local' && (
@@ -136,8 +132,7 @@ export const UploadMethod = ({ onUploadSuccess }: UploadMethodProps) => {
                 </div>
                 {selectedFile && (
                   <div className="text-sm">
-                    Selected: {selectedFile.name} (
-                    {Math.round(selectedFile.size / 1024)} KB)
+                    Selected: {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
                   </div>
                 )}
                 {uploadProgress > 0 && (
@@ -148,9 +143,7 @@ export const UploadMethod = ({ onUploadSuccess }: UploadMethodProps) => {
                   </div>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground">
-                Supports PDF, Word, Excel, Markdown, TXT format files.
-              </p>
+              <p className="text-sm text-muted-foreground">Supports PDF, Word, Excel, Markdown, TXT format files.</p>
             </div>
           )}
           {activeTab === 'url' && (

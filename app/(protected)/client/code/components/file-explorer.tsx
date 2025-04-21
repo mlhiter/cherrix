@@ -18,13 +18,8 @@ interface FileNode {
   isOpen?: boolean
 }
 
-export function FileExplorer({
-  webcontainerInstance,
-  onFileSelectAction,
-}: FileExplorerProps) {
-  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(
-    new Set(['.'])
-  )
+export function FileExplorer({ webcontainerInstance, onFileSelectAction }: FileExplorerProps) {
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set(['.']))
   const { files, isLoading, error, buildFileTree } = useFileSystemStore()
 
   useEffect(() => {
@@ -76,9 +71,7 @@ export function FileExplorer({
           <span className="text-sm">{node.name}</span>
         </div>
         {node.type === 'directory' && isExpanded && node.children && (
-          <div>
-            {node.children.map((child) => renderNode(child, level + 1))}
-          </div>
+          <div>{node.children.map((child) => renderNode(child, level + 1))}</div>
         )}
       </div>
     )
@@ -94,9 +87,7 @@ export function FileExplorer({
       ) : error ? (
         <div className="p-4 text-center text-sm text-red-500">{error}</div>
       ) : (
-        <div className="max-h-[calc(100vh-220px)] overflow-y-auto p-2">
-          {files.map((node) => renderNode(node))}
-        </div>
+        <div className="max-h-[calc(100vh-220px)] overflow-y-auto p-2">{files.map((node) => renderNode(node))}</div>
       )}
     </div>
   )

@@ -8,10 +8,7 @@ export async function POST(req: Request) {
     const session = await auth()
 
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
 
     const { title, content, isPublic, collaborators } = await req.json()
@@ -46,18 +43,12 @@ export async function GET(req: Request) {
     const session = await auth()
 
     if (!session || !session.user || !session.user.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized', details: 'User not authenticated' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized', details: 'User not authenticated' }, { status: 401 })
     }
 
     const notes = await db.note.findMany({
       where: {
-        OR: [
-          { userId: session.user.id },
-          { collaborators: { some: { id: session.user.id } } },
-        ],
+        OR: [{ userId: session.user.id }, { collaborators: { some: { id: session.user.id } } }],
       },
       orderBy: {
         updatedAt: 'desc',

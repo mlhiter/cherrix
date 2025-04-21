@@ -7,14 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { FieldErrors, useForm } from 'react-hook-form'
 import { useSearchParams } from 'next/navigation'
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { NewPasswordSchema } from '@/schemas'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -55,14 +48,9 @@ export const NewPasswordForm = () => {
   }
 
   return (
-    <CardWrapper
-      headerLabel="Enter your new password"
-      backButtonLabel="Back to login"
-      backButtonHref="/auth/login">
+    <CardWrapper headerLabel="Enter your new password" backButtonLabel="Back to login" backButtonHref="/auth/login">
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, onError)}
-          className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
           <div className="space-y-4">
             <FormField
               control={form.control}

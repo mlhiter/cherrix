@@ -21,13 +21,7 @@ export const LinkButton = ({
           : 'bg-white text-gray-700 hover:text-blue-600'
       )}
       onClick={onClick}>
-      <span
-        className={cn(
-          'flex items-center justify-center',
-          isActive && 'text-blue-500'
-        )}>
-        {icon}
-      </span>
+      <span className={cn('flex items-center justify-center', isActive && 'text-blue-500')}>{icon}</span>
       {label && <span className="ml-2">{label}</span>}
       {isActive && (
         <div className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-b from-blue-50/30 to-blue-100/50 opacity-60" />

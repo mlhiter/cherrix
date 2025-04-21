@@ -1,12 +1,7 @@
 import NextAuth from 'next-auth'
 
 import authConfig from '@/auth.config'
-import {
-  DEFAULT_REDIRECT_URL,
-  apiAuthPrefix,
-  authRoutes,
-  publicRoutes,
-} from '@/routes'
+import { DEFAULT_REDIRECT_URL, apiAuthPrefix, authRoutes, publicRoutes } from '@/routes'
 const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
@@ -33,9 +28,7 @@ export default auth((req) => {
       callbackUrl += nextUrl.search
     }
     const encodedCallbackUrl = encodeURIComponent(callbackUrl)
-    return Response.redirect(
-      new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl)
-    )
+    return Response.redirect(new URL(`/auth/login?callbackUrl=${encodedCallbackUrl}`, nextUrl))
   }
 
   return

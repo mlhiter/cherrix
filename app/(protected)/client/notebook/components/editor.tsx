@@ -29,12 +29,7 @@ interface EditorProps {
   onSaveAction: (content: string) => Promise<void>
 }
 
-export default function Editor({
-  note,
-  collaborators,
-  isSaving,
-  onSaveAction: onSave,
-}: EditorProps) {
+export default function Editor({ note, collaborators, isSaving, onSaveAction: onSave }: EditorProps) {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const editor = useCreateBlockNote({
@@ -85,24 +80,12 @@ export default function Editor({
     <div className="flex h-full w-full flex-col">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">
-            {note?.title || 'Untitled Note'}
-          </h1>
+          <h1 className="text-2xl font-bold">{note?.title || 'Untitled Note'}</h1>
           <div className="flex items-center gap-2">
             {(collaborators || []).map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1">
-                {user.image && (
-                  <img
-                    src={user.image}
-                    alt={user.name || 'User'}
-                    className="h-6 w-6 rounded-full"
-                  />
-                )}
-                <span className="text-sm text-gray-600">
-                  {user.name || 'Anonymous'}
-                </span>
+              <div key={user.id} className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1">
+                {user.image && <img src={user.image} alt={user.name || 'User'} className="h-6 w-6 rounded-full" />}
+                <span className="text-sm text-gray-600">{user.name || 'Anonymous'}</span>
               </div>
             ))}
           </div>

@@ -50,9 +50,7 @@ export default function NotebookPage() {
           }
 
           const data = await createResponse.json()
-          window.dispatchEvent(
-            new CustomEvent('resource-updated', { detail: { type: 'note' } })
-          )
+          window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'note' } }))
           router.push(`/client/notebook/${data.id}`)
         }
       } catch (error) {

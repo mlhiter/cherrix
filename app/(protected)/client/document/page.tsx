@@ -11,9 +11,7 @@ import { DocumentList } from './components/document-list'
 import { MyDocument } from '@/types/document'
 
 export default function DocumentPage() {
-  const [selectedDocument, setSelectedDocument] = useState<null | MyDocument>(
-    null
-  )
+  const [selectedDocument, setSelectedDocument] = useState<null | MyDocument>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [documents, setDocuments] = useState<MyDocument[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -96,11 +94,7 @@ export default function DocumentPage() {
       </div>
 
       {/*File Preview Drawer */}
-      <FilePreview
-        drawerOpen={drawerOpen}
-        setDrawerOpenAction={setDrawerOpen}
-        selectedDocument={selectedDocument}
-      />
+      <FilePreview drawerOpen={drawerOpen} setDrawerOpenAction={setDrawerOpen} selectedDocument={selectedDocument} />
     </div>
   )
 }

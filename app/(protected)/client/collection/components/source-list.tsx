@@ -37,9 +37,7 @@ export function SourceList({ onSourceSelect }: SourceListProps) {
           onClick={() => onSourceSelect(source)}>
           <div className="text-4xl">{source.icon}</div>
           <div className="font-medium">{source.name}</div>
-          <div className="text-sm text-muted-foreground">
-            {source.description}
-          </div>
+          <div className="text-sm text-muted-foreground">{source.description}</div>
         </Card>
       ))}
     </div>

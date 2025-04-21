@@ -29,9 +29,7 @@ export const Preview = ({ iframeUrl }: PreviewProps) => {
         {status !== 'running' ? (
           <div className="flex h-full w-full items-center justify-center rounded-lg">
             <div className="flex flex-col items-center space-y-4">
-              <p className="text-sm font-medium text-gray-600">
-                {getStatusText(status)}
-              </p>
+              <p className="text-sm font-medium text-gray-600">{getStatusText(status)}</p>
               {status === 'installing' && (
                 <div className="w-48">
                   <div className="h-1.5 w-full animate-pulse rounded-full bg-gray-200">
@@ -42,11 +40,7 @@ export const Preview = ({ iframeUrl }: PreviewProps) => {
             </div>
           </div>
         ) : (
-          <iframe
-            ref={iframeRef}
-            className="h-full w-full"
-            title="WebContainer Preview"
-          />
+          <iframe ref={iframeRef} className="h-full w-full" title="WebContainer Preview" />
         )}
       </div>
     </div>

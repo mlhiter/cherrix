@@ -6,14 +6,7 @@ import { useState, useTransition } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FieldErrors, useForm } from 'react-hook-form'
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { ResetSchema } from '@/schemas'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
@@ -51,14 +44,9 @@ export const ResetForm = () => {
   }
 
   return (
-    <CardWrapper
-      headerLabel="Reset your password"
-      backButtonLabel="Back to login"
-      backButtonHref="/auth/login">
+    <CardWrapper headerLabel="Reset your password" backButtonLabel="Back to login" backButtonHref="/auth/login">
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, onError)}
-          className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6">
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -67,13 +55,7 @@ export const ResetForm = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Email"
-                      type="email"
-                      autoComplete="email"
-                      disabled={isPending}
-                    />
+                    <Input {...field} placeholder="Email" type="email" autoComplete="email" disabled={isPending} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

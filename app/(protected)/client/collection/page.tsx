@@ -15,9 +15,7 @@ import { CollectionSource, CollectionItem } from '@/types/collection'
 export default function CollectionPage() {
   const [items, setItems] = useState<CollectionItem[]>([])
   const [selectedItem, setSelectedItem] = useState<CollectionItem | null>(null)
-  const [selectedSource, setSelectedSource] = useState<CollectionSource | null>(
-    null
-  )
+  const [selectedSource, setSelectedSource] = useState<CollectionSource | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -46,18 +44,12 @@ export default function CollectionPage() {
     setIsDialogOpen(true)
   }
 
-  const handleSourceSubmit = async (data: {
-    name: string
-    url: string
-    syncFrequency: string
-  }) => {
+  const handleSourceSubmit = async (data: { name: string; url: string; syncFrequency: string }) => {
     if (!selectedSource) return
 
     try {
       // Check if URL already exists
-      const existingCollection = items.find(
-        (item) => item.originalUrl === data.url
-      )
+      const existingCollection = items.find((item) => item.originalUrl === data.url)
       if (existingCollection) {
         toast.error('This URL has already been added to your collection')
         return
@@ -197,11 +189,7 @@ export default function CollectionPage() {
       />
 
       {/* Collection Preview Drawer */}
-      <CollectionPreview
-        drawerOpen={isDrawerOpen}
-        setDrawerOpenAction={setIsDrawerOpen}
-        selectedItem={selectedItem}
-      />
+      <CollectionPreview drawerOpen={isDrawerOpen} setDrawerOpenAction={setIsDrawerOpen} selectedItem={selectedItem} />
     </div>
   )
 }

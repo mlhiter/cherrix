@@ -19,10 +19,7 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
       <Navbar />
       {!isClientRoute && (
         <div className="container my-6">
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/client/home')}
-            className="gap-2">
+          <Button variant="ghost" onClick={() => router.push('/client/home')} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </Button>

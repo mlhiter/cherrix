@@ -7,25 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useSession } from 'next-auth/react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { settings } from '@/actions/settings'
 import { SettingsSchema } from '@/schemas'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  Form,
-  FormMessage,
-  FormDescription,
-} from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormLabel, Form, FormMessage, FormDescription } from '@/components/ui/form'
 import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { useCurrentUser } from '@/hooks/use-current-user'
@@ -116,11 +102,7 @@ const SettingsPage = () => {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="******"
-                          type="password"
-                        />
+                        <Input {...field} placeholder="******" type="password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -135,11 +117,7 @@ const SettingsPage = () => {
                     <FormItem>
                       <FormLabel>New Password</FormLabel>
                       <FormControl>
-                        <Input
-                          {...field}
-                          placeholder="******"
-                          type="password"
-                        />
+                        <Input {...field} placeholder="******" type="password" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -152,11 +130,7 @@ const SettingsPage = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
-                    <Select
-                      {...field}
-                      disabled={isPending}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}>
+                    <Select {...field} disabled={isPending} onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a Role" />
@@ -179,16 +153,10 @@ const SettingsPage = () => {
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
                       <div className="space-y-0.5">
                         <FormLabel>Two Factor Authentication</FormLabel>
-                        <FormDescription>
-                          Enable two factor authentication for your account
-                        </FormDescription>
+                        <FormDescription>Enable two factor authentication for your account</FormDescription>
                       </div>
                       <FormControl>
-                        <Switch
-                          disabled={isPending}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Switch disabled={isPending} checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

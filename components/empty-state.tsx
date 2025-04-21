@@ -8,12 +8,7 @@ interface EmptyStateProps {
   className?: string
 }
 
-export function EmptyState({
-  title,
-  description,
-  icon: Icon = FileText,
-  className,
-}: EmptyStateProps) {
+export function EmptyState({ title, description, icon: Icon = FileText, className }: EmptyStateProps) {
   return (
     <div
       className={cn(
@@ -25,9 +20,7 @@ export function EmptyState({
       </div>
       <div className="space-y-1">
         <h3 className="text-lg font-medium">{title}</h3>
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
     </div>
   )
