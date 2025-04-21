@@ -5,7 +5,7 @@ import { forwardRef, useImperativeHandle } from 'react'
 import MonacoEditor, { loader } from '@monaco-editor/react'
 
 import { useFileSystemStore } from '@/stores/file-system'
-import { MONACO_EDITOR_CONFIG } from '@/constants/monaco-editor'
+import { MONACO_EDITOR_CONFIG } from '@/constants/code'
 
 loader.config({
   paths: {
@@ -95,6 +95,8 @@ export const CodeEditor = forwardRef<EditorRef, EditorProps>(
     )
   }
 )
+
+CodeEditor.displayName = 'CodeEditor'
 
 export const getLanguageFromFileName = (fileName: string): string => {
   const extension = fileName.split('.').pop()?.toLowerCase()
