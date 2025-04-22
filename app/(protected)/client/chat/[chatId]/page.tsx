@@ -20,6 +20,7 @@ export default function ChatPage() {
   const chatId = params.chatId as string
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [initialMessages, setInitialMessages] = useState([])
+  const [context, setContext] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchInitialMessages = async () => {
@@ -41,6 +42,21 @@ export default function ChatPage() {
     maxSteps: 10,
     initialMessages,
     api: `/api/chat/${chatId}/message`,
+    experimental_throttle: 100,
+    onError: (error) => {
+      console.error('Error:', error)
+    },
+    onResponse: (response) => {
+      const context = response.headers.get('X-Context')
+      if (context) {
+        try {
+          const decodedContext = Buffer.from(context, 'base64').toString('utf-8')
+          setContext(decodedContext)
+        } catch (e) {
+          console.error('Failed to decode context:', e)
+        }
+      }
+    },
     onFinish: async (message) => {
       const response = await fetch(`/api/chat/${chatId}/message`, {
         method: 'PATCH',
@@ -89,6 +105,9 @@ export default function ChatPage() {
                     content={message.content}
                     timestamp={format(message.createdAt ?? new Date(), 'HH:mm')}
                     role={message.role as ChatRole}
+                    context={
+                      context ? context.split('\n\n').map((line) => line.replace(/^\[citation:\d+\]\s*/, '')) : []
+                    }
                   />
                 ))}
                 <div ref={messagesEndRef} />
@@ -128,17 +147,9 @@ export default function ChatPage() {
                 <Button
                   type="submit"
                   className="h-10 w-10 rounded-full p-0 transition-all hover:scale-105 hover:bg-primary/90 active:scale-95"
-                  disabled={
-                    !input.trim() ||
-                    status === 'submitted' ||
-                    status === 'streaming'
-                  }
+                  disabled={!input.trim() || status === 'submitted' || status === 'streaming'}
                   aria-label="Send Message">
-                  {status === 'error' ? (
-                    <AlertCircle className="h-5 w-5" />
-                  ) : (
-                    <PaperPlaneIcon className="h-5 w-5" />
-                  )}
+                  {status === 'error' ? <AlertCircle className="h-5 w-5" /> : <PaperPlaneIcon className="h-5 w-5" />}
                   <span className="sr-only">Send Message</span>
                 </Button>
               </form>

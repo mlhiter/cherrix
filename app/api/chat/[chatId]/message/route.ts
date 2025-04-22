@@ -68,8 +68,9 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
     // TODO: The context needs to be more focused; the current context is too scattered.
     if (lastUserMessage) {
       const searchResults = await similaritySearch(lastUserMessage.content)
-      context = searchResults.map((doc, index) => `[${index + 1}] ${doc.pageContent}`).join('\n\n')
+      context = searchResults.map((doc, index) => `[citation:${index + 1}] ${doc.pageContent}`).join('\n\n')
     }
+    console.log('context', context)
 
     let apiKeyConfig
     if (process.env.NODE_ENV === 'development') {
@@ -108,8 +109,11 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
       messages: convertToCoreMessages(messages),
     })
 
-    // Return streaming response
-    return result.toDataStreamResponse()
+    // Create a custom response that includes context
+    const response = result.toDataStreamResponse()
+    response.headers.set('X-Context', Buffer.from(context).toString('base64'))
+
+    return response
   } catch (error) {
     console.error('Error creating message:', error)
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
