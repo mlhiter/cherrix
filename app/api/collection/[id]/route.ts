@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
 
-// GET /api/collection/[id]
+import { db } from '@/lib/db'
+import { auth } from '@/auth'
+
 export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
+  const { id } = await params
+  const session = await auth()
 
   if (!session?.user) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
-    const collection = await prisma.collection.findUnique({
+    const collection = await db.collection.findUnique({
       where: {
-        id: params.id,
+        id,
         userId: session.user.id,
       },
     })
@@ -30,9 +30,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-// PATCH /api/collection/[id]
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
+  const session = await auth()
 
   if (!session?.user) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
@@ -40,16 +39,14 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
   try {
     const body = await request.json()
-    const { content, metadata, lastSyncTime } = body
+    const { lastSyncTime } = body
 
-    const collection = await prisma.collection.update({
+    const collection = await db.collection.update({
       where: {
         id: params.id,
         userId: session.user.id,
       },
       data: {
-        content,
-        metadata,
         lastSyncTime: lastSyncTime ? new Date(lastSyncTime) : undefined,
       },
     })

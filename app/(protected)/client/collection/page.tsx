@@ -9,7 +9,8 @@ import { SourceDialog } from './components/source-dialog'
 import { CollectionList } from './components/collection-list'
 import { CollectionPreview } from './components/collection-preview'
 
-import { syncCollection } from '@/services/sync-service'
+import { syncCollection, initializeSyncJobs, stopSyncJob } from '@/services/sync/sync-service'
+
 import { CollectionSource, CollectionItem } from '@/types/collection'
 
 export default function CollectionPage() {
@@ -29,6 +30,7 @@ export default function CollectionPage() {
 
       if (data.success) {
         setItems(data.collections)
+        initializeSyncJobs(data.collections)
       } else {
         throw new Error(data.error || 'Failed to fetch collections')
       }
@@ -156,6 +158,12 @@ export default function CollectionPage() {
 
   useEffect(() => {
     fetchCollections()
+
+    return () => {
+      items.forEach((item) => {
+        stopSyncJob(item.id)
+      })
+    }
   }, [])
 
   return (
