@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import cron from 'node-cron'
 import { CollectionItem } from '@/types/collection'
 
 async function syncCollectionItem(item: CollectionItem) {
