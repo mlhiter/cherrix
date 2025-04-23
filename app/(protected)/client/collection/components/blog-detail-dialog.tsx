@@ -33,8 +33,8 @@ export const BlogDetailDialog = ({ item, open, onOpenChange }: BlogDetailDialogP
                 const src = props.src || ''
                 const alt = props.alt || 'Blog image'
 
-                const isRelativePath = !src.startsWith('http')
-                const imageUrl = isRelativePath ? new URL(src, item.url).toString() : src
+                const isRelativePath = typeof src === 'string' && !src.startsWith('http')
+                const imageUrl = isRelativePath ? new URL(src, item.url).toString() : (src as string)
 
                 return (
                   <span className="my-4 block">
