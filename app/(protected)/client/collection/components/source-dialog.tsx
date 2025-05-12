@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { CollectionSource } from '@/types/collection'
+import { CollectionItem, CollectionSource } from '@/types/collection'
 
 interface SourceDialogProps {
   source: CollectionSource | null
@@ -18,7 +18,7 @@ interface SourceDialogProps {
 export function SourceDialog({ source, open, onOpenChange, onSubmit }: SourceDialogProps) {
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
-  const [syncFrequency, setSyncFrequency] = useState('every-day')
+  const [syncFrequency, setSyncFrequency] = useState<CollectionItem['syncFrequency']>('daily')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,7 +28,7 @@ export function SourceDialog({ source, open, onOpenChange, onSubmit }: SourceDia
       await onSubmit({ name, url, syncFrequency })
       setName('')
       setUrl('')
-      setSyncFrequency('every-day')
+      setSyncFrequency('daily')
     } catch (error) {
       console.error('Failed to submit:', error)
     } finally {
@@ -82,14 +82,16 @@ export function SourceDialog({ source, open, onOpenChange, onSubmit }: SourceDia
 
           <div className="space-y-2">
             <Label htmlFor="frequency">Sync Frequency</Label>
-            <Select value={syncFrequency} onValueChange={(value) => setSyncFrequency(value)}>
+            <Select
+              value={syncFrequency}
+              onValueChange={(value) => setSyncFrequency(value as CollectionItem['syncFrequency'])}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Sync Frequency" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="every-day">Every Day</SelectItem>
-                <SelectItem value="every-week">Every Week</SelectItem>
-                <SelectItem value="every-month">Every Month</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>
           </div>

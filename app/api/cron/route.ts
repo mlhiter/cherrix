@@ -51,7 +51,6 @@ async function getCollectionsToSync(): Promise<CollectionItem[]> {
 }
 
 export async function GET(request: Request) {
-  // 检查认证头
   const authHeader = request.headers.get('authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
@@ -71,9 +70,9 @@ export async function GET(request: Request) {
       const hoursSinceLastSync = (now.getTime() - lastSync.getTime()) / (1000 * 60 * 60)
 
       const shouldSync =
-        (item.syncFrequency === 'every-day' && hoursSinceLastSync >= 24) ||
-        (item.syncFrequency === 'every-week' && hoursSinceLastSync >= 24 * 7) ||
-        (item.syncFrequency === 'every-month' && hoursSinceLastSync >= 24 * 30)
+        (item.syncFrequency === 'daily' && hoursSinceLastSync >= 24) ||
+        (item.syncFrequency === 'weekly' && hoursSinceLastSync >= 24 * 7) ||
+        (item.syncFrequency === 'monthly' && hoursSinceLastSync >= 24 * 30)
 
       if (shouldSync) {
         console.log(`Syncing collection item: ${item.name}`)

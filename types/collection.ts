@@ -53,7 +53,7 @@ export interface CollectionItem {
   name: string
   sourceType: 'OFFICIAL_DOC' | 'RSS_BLOG' | 'GITHUB'
   originalUrl: string
-  syncFrequency: string
+  syncFrequency: 'daily' | 'weekly' | 'monthly'
   lastSyncTime: Date
   userId: string
   docItems?: DocItem[]
