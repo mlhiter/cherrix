@@ -151,13 +151,43 @@ model DocItem {
   title         String
   url           String
   content       String?     @db.Text
+  textContent   String?     @db.Text
   lastSyncTime  DateTime
+  lastUpdated   String?
+  baseUrl       String?
   collectionId  String
   collection    Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  images        DocImage[]
+  tableOfContents DocTableOfContents[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
   @@index([collectionId])
+}
+
+model DocImage {
+  id            String      @id @default(cuid())
+  url           String
+  alt           String?
+  docItemId     String
+  docItem       DocItem     @relation(fields: [docItemId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([docItemId])
+}
+
+model DocTableOfContents {
+  id            String      @id @default(cuid())
+  text          String
+  url           String
+  level         Int
+  docItemId     String
+  docItem       DocItem     @relation(fields: [docItemId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([docItemId])
 }
 
 model BlogItem {

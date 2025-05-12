@@ -16,7 +16,12 @@ export async function GET(request: Request, { params }: { params: { id: string }
         userId: session.user.id,
       },
       include: {
-        docItems: true,
+        docItems: {
+          include: {
+            images: true,
+            tableOfContents: true,
+          },
+        },
         blogItems: true,
         githubItems: true,
       },

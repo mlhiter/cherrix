@@ -11,8 +11,20 @@ export interface DocItem {
   id: string
   title: string
   content: string
+  textContent?: string
   url: string
   lastSyncTime: Date
+  lastUpdated?: string
+  baseUrl?: string
+  tableOfContents?: Array<{
+    text: string
+    url: string
+    level: number
+  }>
+  images?: Array<{
+    url: string
+    alt: string
+  }>
 }
 
 export interface BlogItem {

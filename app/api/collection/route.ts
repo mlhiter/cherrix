@@ -26,89 +26,109 @@ export async function GET() {
 
 // POST /api/collection
 export async function POST(request: Request) {
-  const session = await auth()
-
-  if (!session?.user || !session.user.id) {
-    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-  }
-
   try {
-    // TODO: we need to zod validate the request body nad fetch
-    const { name, sourceType, originalUrl, syncFrequency, items, content, metadata } = await request.json()
+    const session = await auth()
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    }
 
-    // Check if a collection with the same originalUrl and userId already exists
-    const existingCollection = await db.collection.findUnique({
+    const { name, sourceType, originalUrl, syncFrequency, content, metadata, items } = await request.json()
+
+    // Check if the collection with the same URL already exists
+    const existingCollection = await db.collection.findFirst({
       where: {
-        originalUrl_userId: {
-          originalUrl,
-          userId: session.user.id,
-        },
+        originalUrl,
+        userId: session.user.id,
       },
     })
 
     if (existingCollection) {
-      return NextResponse.json(
-        { success: false, error: 'Collection with this original URL already exists for the user.' },
-        { status: 409 }
-      )
+      return NextResponse.json({ success: false, error: 'Collection with this URL already exists' }, { status: 400 })
     }
 
-    const newCollection = await db.collection.create({
+    // Create collection based on source type
+    const collection = await db.collection.create({
       data: {
         name,
         sourceType: sourceType as SourceType,
         originalUrl,
         syncFrequency,
-        userId: session.user.id,
         lastSyncTime: new Date(),
+        userId: session.user.id as string,
       },
     })
 
-    if ((items && items.length > 0) || content) {
-      switch (sourceType) {
-        case 'OFFICIAL_DOC':
-          await db.docItem.createMany({
-            data: items.map((item: any) => ({
-              ...item,
-              collectionId: newCollection.id,
-            })),
-          })
-          break
-        case 'RSS_BLOG':
-          await db.blogItem.createMany({
-            data: items.map((item: any) => ({
-              title: item.title,
-              url: item.url,
-              content: item.content,
-              publishDate: item.publishDate,
-              author: item.author,
-              collectionId: newCollection.id,
-              lastSyncTime: item.lastSyncTime,
-            })),
-          })
-          break
-        case 'GITHUB':
-          await db.githubItem.create({
-            data: {
-              ...metadata,
-              readme: content,
-              collectionId: newCollection.id,
+    // Create related items based on source type
+    switch (sourceType) {
+      case 'OFFICIAL_DOC': {
+        const images =
+          metadata.images?.map((img: any) => ({
+            url: img.url,
+            alt: img.alt || '',
+          })) || []
+
+        const tableOfContentsItems =
+          metadata.tableOfContents?.map((toc: any) => ({
+            text: toc.text,
+            url: toc.url,
+            level: toc.level,
+          })) || []
+
+        await db.docItem.create({
+          data: {
+            ...metadata,
+            content: content,
+            textContent: content.textContent,
+            lastSyncTime: new Date(),
+            collectionId: collection.id,
+            images: {
+              create: images,
             },
-          })
-          break
+            tableOfContents: {
+              create: tableOfContentsItems,
+            },
+          },
+        })
+        break
       }
+      case 'RSS_BLOG':
+        await db.blogItem.createMany({
+          data: items.map((item: any) => ({
+            title: item.title,
+            url: item.url,
+            content: item.content,
+            publishDate: item.publishDate,
+            author: item.author,
+            collectionId: collection.id,
+            lastSyncTime: item.lastSyncTime,
+          })),
+        })
+        break
+      case 'GITHUB':
+        await db.githubItem.create({
+          data: {
+            name: metadata.name || 'GitHub Repository',
+            url: metadata.url,
+            readme: content,
+            description: metadata.description,
+            stars: metadata.stars,
+            forks: metadata.forks,
+            language: metadata.language,
+            topics: [],
+            lastSyncTime: new Date(),
+            collectionId: collection.id,
+          },
+        })
+        break
     }
 
-    return NextResponse.json({ success: true, collection: newCollection })
+    return NextResponse.json({ success: true, collection })
   } catch (error) {
     console.error('Failed to create collection', error)
-    if (error instanceof Error && (error as any).code === 'P2002') {
-      return NextResponse.json(
-        { success: false, error: 'A collection with this unique identifier already exists.' },
-        { status: 409 }
-      )
-    }
-    return NextResponse.json({ success: false, error: 'Failed to create collection' }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: (error as Error).message || 'Failed to create collection' },
+      { status: 500 }
+    )
   }
 }
 
