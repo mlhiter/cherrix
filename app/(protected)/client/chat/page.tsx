@@ -1,6 +1,7 @@
 'use client'
 
 import { toast } from 'sonner'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Loader2 } from 'lucide-react'
@@ -68,9 +69,7 @@ export default function ChatPage() {
           }
 
           const data = await createResponse.json()
-          window.dispatchEvent(
-            new CustomEvent('resource-updated', { detail: { type: 'chat' } })
-          )
+          window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'chat' } }))
           router.push(`/client/chat/${data.id}`)
         }
       } catch (error) {
@@ -102,9 +101,7 @@ export default function ChatPage() {
       }
 
       const chat = await response.json()
-      window.dispatchEvent(
-        new CustomEvent('resource-updated', { detail: { type: 'chat' } })
-      )
+      window.dispatchEvent(new CustomEvent('resource-updated', { detail: { type: 'chat' } }))
       router.push(`/client/chat/${chat.id}`)
     } catch (error) {
       console.error('Error creating chat:', error)
@@ -140,14 +137,12 @@ export default function ChatPage() {
               onClick={() => router.push(`/client/chat/${chat.id}`)}>
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{chat.title}</h3>
-                <span className="text-sm text-muted-foreground">
-                  {new Date(chat.updatedAt).toLocaleDateString()}
-                </span>
+                <span className="text-sm text-muted-foreground">{new Date(chat.updatedAt).toLocaleDateString()}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
                   {[chat.user, ...chat.collaborators].map((user) => (
-                    <img
+                    <Image
                       key={user.id}
                       src={user.image || '/default-avatar.png'}
                       alt={user.name || 'User'}

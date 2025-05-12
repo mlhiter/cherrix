@@ -67,7 +67,14 @@ export const ResourceItem = ({ item, type, onDelete, onRename }: ResourceItemPro
             onClick={(e) => e.stopPropagation()}
           />
         ) : (
-          <div className="text-sm font-medium">{item.title}</div>
+          <div
+            className="text-sm font-medium"
+            onDoubleClick={(e) => {
+              e.stopPropagation()
+              setIsEditing(true)
+            }}>
+            {item.title}
+          </div>
         )}
       </div>
       <div className="flex opacity-0 group-hover:opacity-100">

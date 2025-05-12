@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns'
 import { useChat } from '@ai-sdk/react'
-import { ChatRole } from '@prisma/client'
+import { ChatRole, Chat } from '@prisma/client'
 import { useParams } from 'next/navigation'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
@@ -18,9 +18,19 @@ import { ChatMessage as ChatMessageComponent } from '../components/chat-message'
 export default function ChatPage() {
   const params = useParams()
   const chatId = params.chatId as string
+  const [chat, setChat] = useState<Chat | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [initialMessages, setInitialMessages] = useState([])
   const [context, setContext] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchChat = async () => {
+      const response = await fetch(`/api/chat/${chatId}`)
+      const data = await response.json()
+      setChat(data)
+    }
+    fetchChat()
+  }, [chatId])
 
   useEffect(() => {
     const fetchInitialMessages = async () => {
@@ -90,9 +100,20 @@ export default function ChatPage() {
     }
   }
 
+  if (!chat) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading chat...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full flex-col gap-4">
-      <Header title="Chat" />
+      <Header title={chat.title} />
       <div className="flex h-[calc(100vh-190px)] flex-col">
         <Card className="relative flex-1 overflow-hidden">
           <div className="flex h-full flex-col">

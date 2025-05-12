@@ -42,15 +42,9 @@ const useResources = (type: ResourceType) => {
       }
     }
 
-    window.addEventListener(
-      'resource-updated',
-      handleResourceUpdate as EventListener
-    )
+    window.addEventListener('resource-updated', handleResourceUpdate as EventListener)
     return () => {
-      window.removeEventListener(
-        'resource-updated',
-        handleResourceUpdate as EventListener
-      )
+      window.removeEventListener('resource-updated', handleResourceUpdate as EventListener)
     }
   }, [type])
 
@@ -118,11 +112,7 @@ const useResources = (type: ResourceType) => {
         body: JSON.stringify({ title: newTitle }),
       })
       if (!response.ok) throw new Error(`Failed to rename ${type}`)
-      setResources(
-        resources.map((resource) =>
-          resource.id === id ? { ...resource, title: newTitle } : resource
-        )
-      )
+      setResources(resources.map((resource) => (resource.id === id ? { ...resource, title: newTitle } : resource)))
     } catch (error) {
       console.error(`Error renaming ${type}:`, error)
     }
@@ -143,11 +133,8 @@ export const ResourceList = () => {
   const [newTitle, setNewTitle] = useState('')
   const [isCreating, setIsCreating] = useState(false)
 
-  const resourceType: ResourceType = pathname.includes('/notebook')
-    ? 'note'
-    : 'chat'
-  const { resources, isLoading, handleDelete, handleCreate, handleRename } =
-    useResources(resourceType)
+  const resourceType: ResourceType = pathname.includes('/notebook') ? 'note' : 'chat'
+  const { resources, isLoading, handleDelete, handleCreate, handleRename } = useResources(resourceType)
 
   const getListTitle = () => {
     if (pathname.includes('/notebook')) return 'Notes'
@@ -157,14 +144,25 @@ export const ResourceList = () => {
   }
 
   const handleCreateSubmit = async () => {
-    if (!newTitle.trim()) return
+    if (!newTitle.trim()) {
+      setIsCreating(false)
+      return
+    }
     const newResource = await handleCreate(newTitle)
     if (newResource) {
       setNewTitle('')
       setIsCreating(false)
-      const basePath =
-        resourceType === 'note' ? '/client/notebook' : '/client/chat'
+      const basePath = resourceType === 'note' ? '/client/notebook' : '/client/chat'
       router.push(`${basePath}/${newResource.id}`)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCreateSubmit()
+    } else if (e.key === 'Escape') {
+      setNewTitle('')
+      setIsCreating(false)
     }
   }
 
@@ -172,43 +170,16 @@ export const ResourceList = () => {
     <div className="h-full w-full rounded-sm border-gray-200 p-2">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            disabled
-            className="border-none bg-transparent shadow-none">
+          <Button variant="outline" disabled className="border-none bg-transparent shadow-none">
             <Pin className="mr-2 h-4 w-4" />
             {getListTitle()}
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => setIsCreating(true)}>
-            <Plus className="h-4 w-4" />
-          </Button>
         </div>
-
-        {isCreating && (
-          <div className="flex gap-2">
-            <Input
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Enter title..."
-              className="h-8"
-            />
-            <Button
-              variant="outline"
-              className="h-8"
-              onClick={handleCreateSubmit}>
-              Create
-            </Button>
-          </div>
-        )}
 
         {isLoading ? (
           <div className="text-sm text-gray-500">Loading...</div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 pl-4">
             {resources.map((resource) => (
               <ResourceItem
                 key={resource.id}
@@ -218,6 +189,27 @@ export const ResourceList = () => {
                 onRename={handleRename}
               />
             ))}
+
+            {isCreating ? (
+              <div className="flex items-center gap-2 pl-6">
+                <Input
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onBlur={() => setIsCreating(false)}
+                  placeholder="Enter title..."
+                  className="h-7"
+                  autoFocus
+                />
+              </div>
+            ) : (
+              <div
+                className="group flex min-h-6 cursor-pointer items-center gap-2 text-gray-500 hover:text-primary"
+                onClick={() => setIsCreating(true)}>
+                <Plus className="h-4 w-4" />
+                <div className="text-sm">New {resourceType}</div>
+              </div>
+            )}
           </div>
         )}
       </div>

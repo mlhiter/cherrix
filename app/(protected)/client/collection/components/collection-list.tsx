@@ -93,7 +93,7 @@ export function CollectionList({ items, onView, onDelete, onSync, isLoading = fa
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0 hover:text-red-500"
+                      className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                       onClick={() => onDelete(item.id)}
                       title="Delete">
                       <Trash className="h-4 w-4" />
