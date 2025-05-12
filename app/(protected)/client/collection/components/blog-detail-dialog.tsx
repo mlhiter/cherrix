@@ -30,10 +30,10 @@ export const BlogDetailDialog = ({ item, open, onOpenChange }: BlogDetailDialogP
             rehypePlugins={[rehypeRaw]}
             components={{
               img: ({ node, ...props }) => {
-                const src = props.src || ''
+                const src = (props.src as string) || ''
                 const alt = props.alt || 'Blog image'
 
-                const isRelativePath = !src.startsWith('http')
+                const isRelativePath = typeof src === 'string' && !src.startsWith('http')
                 const imageUrl = isRelativePath ? new URL(src, item.url).toString() : src
 
                 return (
