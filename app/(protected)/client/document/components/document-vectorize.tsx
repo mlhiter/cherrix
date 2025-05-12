@@ -4,16 +4,18 @@ import { Loader2, Database } from 'lucide-react'
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 
 import { MyDocument } from '@/types/document'
 
 interface DocumentVectorizeProps {
   document: MyDocument
+  displayAsBadge?: boolean
 }
 
-export function DocumentVectorize({ document }: DocumentVectorizeProps) {
+export function DocumentVectorize({ document, displayAsBadge = false }: DocumentVectorizeProps) {
   const [isVectorizing, setIsVectorizing] = useState(false)
-  const [isVectorized, setIsVectorized] = useState(false)
+  const [isVectorized, setIsVectorized] = useState(document.isVectorized || false)
 
   const handleVectorize = async () => {
     try {
@@ -43,6 +45,34 @@ export function DocumentVectorize({ document }: DocumentVectorizeProps) {
     } finally {
       setIsVectorizing(false)
     }
+  }
+
+  if (displayAsBadge) {
+    return (
+      <Badge
+        variant={isVectorized ? 'success' : 'secondary'}
+        className="cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation()
+          if (!isVectorized && !isVectorizing) {
+            handleVectorize()
+          }
+        }}>
+        {isVectorizing ? (
+          <>
+            <Loader2 className="mr-1 h-3 w-3 animate-spin" /> Vectorizing
+          </>
+        ) : isVectorized ? (
+          <>
+            <Database className="mr-1 h-3 w-3" /> Vectorized
+          </>
+        ) : (
+          <>
+            <Database className="mr-1 h-3 w-3" /> Vectorize
+          </>
+        )}
+      </Badge>
+    )
   }
 
   return (

@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { minioClient } from '@/lib/minio'
+import { processDocument } from '@/lib/document-processor'
+import { addDocumentsToVectorStore } from '@/lib/vector-store'
 
 export async function ensureBucketExists(bucketName: string): Promise<boolean> {
   try {
@@ -72,6 +74,40 @@ export async function POST(req: Request) {
           isPinned: false,
         },
       })
+
+      // Automatically vectorize the document after upload
+      try {
+        // Get the file data for vectorization
+        const dataStream = await minioClient.getObject(bucketName, objectKey)
+        const chunks: Buffer[] = []
+        for await (const chunk of dataStream) {
+          chunks.push(Buffer.from(chunk))
+        }
+        const buffer = Buffer.concat(chunks)
+
+        let text: string
+
+        if (fileType === 'pdf') {
+          const pdf = await import('pdf-parse')
+          const pdfData = await pdf.default(buffer)
+          text = pdfData.text
+        } else {
+          text = buffer.toString('utf-8')
+        }
+
+        const documents = await processDocument(text, file.name, fileType)
+        await addDocumentsToVectorStore(documents)
+
+        // Update document status to indicate it's been vectorized
+        await db.document.update({
+          where: { id: document.id },
+          data: { isVectorized: true },
+        })
+      } catch (vectorizeError) {
+        console.error('Auto-vectorization failed:', vectorizeError)
+        // Continue with the response even if vectorization fails
+        // The user can try manual vectorization later
+      }
 
       return NextResponse.json({
         success: true,

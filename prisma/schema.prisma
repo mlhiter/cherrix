@@ -119,6 +119,7 @@ model Document {
   isArchived    Boolean @default(false)
   isFavorite    Boolean @default(false)
   isPinned      Boolean @default(false)
+  isVectorized  Boolean @default(false)
   tags          String[]
 
   createdAt     DateTime @default(now())

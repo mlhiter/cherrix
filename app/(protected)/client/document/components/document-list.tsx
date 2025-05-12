@@ -1,4 +1,5 @@
 import { EllipsisVerticalIcon, ListCollapse, Trash, Loader2, File } from 'lucide-react'
+import Image from 'next/image'
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Card } from '@/components/ui/card'
@@ -16,6 +17,21 @@ interface DocumentListProps {
   setDrawerOpen: (open: boolean) => void
   isLoading?: boolean
   onDelete?: (documentId: string) => void
+}
+
+const getFileIcon = (fileType: string) => {
+  const type = fileType.toLowerCase()
+
+  switch (true) {
+    case type.includes('pdf'):
+      return <Image src="/icons/pdf.svg" alt="pdf" width={16} height={16} />
+    case type.includes('doc') || type.includes('docx') || type.includes('txt'):
+      return <Image src="/icons/doc.svg" alt="doc" width={16} height={16} />
+    case type.includes('excel'):
+      return <Image src="/icons/excel.svg" alt="excel" width={16} height={16} />
+    default:
+      return <File className="h-4 w-4 text-gray-500" />
+  }
 }
 
 export const DocumentList = ({
@@ -48,6 +64,7 @@ export const DocumentList = ({
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Vector Status</TableHead>
                 <TableHead>Import Time</TableHead>
                 <TableHead className="w-[100px]">Operation</TableHead>
               </TableRow>
@@ -62,11 +79,20 @@ export const DocumentList = ({
                     setDrawerOpen(true)
                   }}>
                   <TableCell>{doc.name}</TableCell>
-                  <TableCell>{doc.type}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      {getFileIcon(doc.type)}
+                      <span className="text-xs uppercase">{doc.type}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                      <DocumentVectorize document={doc} displayAsBadge={true} />
+                    </div>
+                  </TableCell>
                   <TableCell>{doc.importTime ? formatDate(doc.importTime) : '-'}</TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <DocumentVectorize document={doc} />
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm">

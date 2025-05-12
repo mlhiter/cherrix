@@ -12,6 +12,7 @@ export interface MyDocument {
   isArchived: boolean
   isFavorite: boolean
   isPinned: boolean
+  isVectorized: boolean
   tags: string[]
   createdAt: Date
   updatedAt: Date

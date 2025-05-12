@@ -6,6 +6,7 @@ import { Tabs } from '@/components/tabs'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 
 interface UploadMethodProps {
   onUploadSuccess?: () => void
@@ -136,10 +137,8 @@ export const UploadMethod = ({ onUploadSuccess }: UploadMethodProps) => {
                   </div>
                 )}
                 {uploadProgress > 0 && (
-                  <div className="mt-2 h-2.5 w-full rounded-full bg-gray-200">
-                    <div
-                      className="h-2.5 rounded-full bg-blue-600 transition-all duration-300"
-                      style={{ width: `${uploadProgress}%` }}></div>
+                  <div className="mt-2">
+                    <Progress value={uploadProgress} className="h-2.5 w-full" />
                   </div>
                 )}
               </div>
