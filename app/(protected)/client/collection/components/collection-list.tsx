@@ -73,14 +73,29 @@ export function CollectionList({ items, onView, onDelete, onSync, isLoading = fa
                     })}
                   </TableCell>
                   <TableCell>{item.syncFrequency}</TableCell>
-                  <TableCell className="space-x-2" onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" onClick={() => onView(item)} title="View">
+                  <TableCell className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:text-green-600"
+                      onClick={() => onView(item)}
+                      title="View">
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onSync(item.id)} title="Sync Now">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:text-blue-500"
+                      onClick={() => onSync(item.id)}
+                      title="Sync Now">
                       <RefreshCw className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onDelete(item.id)} title="Delete">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:text-red-500"
+                      onClick={() => onDelete(item.id)}
+                      title="Delete">
                       <Trash className="h-4 w-4" />
                     </Button>
                   </TableCell>

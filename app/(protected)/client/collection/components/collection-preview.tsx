@@ -106,7 +106,7 @@ export const CollectionPreview = ({ drawerOpen, setDrawerOpenAction, selectedIte
               {selectedItem && <DrawerTitle>{selectedItem.name}</DrawerTitle>}
               <DrawerDescription>
                 {selectedItem &&
-                  `Source Type: ${selectedItem.sourceType} | Last Sync: ${selectedItem.lastSyncTime || 'Never'}`}
+                  `Source Type: ${selectedItem.sourceType} | Last Sync: ${selectedItem.lastSyncTime ? new Date(selectedItem.lastSyncTime).toLocaleString() : 'Never'}`}
               </DrawerDescription>
 
               {/* GitHub Meta Info (Fixed position) */}
@@ -175,35 +175,8 @@ export const CollectionPreview = ({ drawerOpen, setDrawerOpenAction, selectedIte
                   )}
                 </div>
               )}
-
-              {/* Blog Meta Info (Fixed position) */}
-              {selectedItem?.sourceType === 'RSS_BLOG' && collectionWithItems?.blogItems?.[0] && (
-                <div className="mt-2 flex flex-wrap items-center gap-4 rounded-md bg-card/50 p-3 text-sm">
-                  {collectionWithItems.blogItems[0].title && (
-                    <div className="flex items-center">
-                      <span className="mr-2 font-semibold">{collectionWithItems.blogItems[0].title}</span>
-                    </div>
-                  )}
-                  {collectionWithItems.blogItems[0].publishDate && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(collectionWithItems.blogItems[0].publishDate).toLocaleDateString()}
-                    </span>
-                  )}
-                  {collectionWithItems.blogItems[0].url && (
-                    <a
-                      href={collectionWithItems.blogItems[0].url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-primary hover:underline">
-                      <ExternalLink className="h-4 w-4" />
-                      View Original
-                    </a>
-                  )}
-                </div>
-              )}
             </DrawerHeader>
-            <div className="flex-1 overflow-auto px-4">
+            <div className="flex-1 overflow-auto p-4">
               {isLoading ? (
                 <div className="flex h-full items-center justify-center">
                   <div className="flex flex-col items-center gap-2">
@@ -212,7 +185,7 @@ export const CollectionPreview = ({ drawerOpen, setDrawerOpenAction, selectedIte
                   </div>
                 </div>
               ) : collectionWithItems ? (
-                <div className="flex flex-col gap-4 pb-8">
+                <div className="flex flex-col gap-4 pb-4">
                   {collectionWithItems.docItems?.map((item) => <DocItemPreview key={item.id} item={item} />)}
                   {collectionWithItems.blogItems?.map((item) => (
                     <div
@@ -231,7 +204,7 @@ export const CollectionPreview = ({ drawerOpen, setDrawerOpenAction, selectedIte
                     </div>
                   ))}
                   {collectionWithItems.githubItems?.map((item) => (
-                    <div key={item.id} className="rounded-md bg-card p-4 shadow-sm">
+                    <div key={item.id} className="rounded-md bg-card p-4">
                       <h3 className="mb-2 font-semibold">{item.title}</h3>
                       {item.readme && (
                         <div className="prose prose-sm dark:prose-invert max-w-none">
