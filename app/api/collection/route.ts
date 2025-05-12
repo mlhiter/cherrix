@@ -26,14 +26,32 @@ export async function GET() {
 
 // POST /api/collection
 export async function POST(request: Request) {
-  try {
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-    }
+  const session = await auth()
 
+  if (!session?.user || !session.user.id) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
     // TODO: we need to zod validate the request body nad fetch
-    const { name, sourceType, originalUrl, syncFrequency, items } = await request.json()
+    const { name, sourceType, originalUrl, syncFrequency, items, content, metadata } = await request.json()
+
+    // Check if a collection with the same originalUrl and userId already exists
+    const existingCollection = await db.collection.findUnique({
+      where: {
+        originalUrl_userId: {
+          originalUrl,
+          userId: session.user.id,
+        },
+      },
+    })
+
+    if (existingCollection) {
+      return NextResponse.json(
+        { success: false, error: 'Collection with this original URL already exists for the user.' },
+        { status: 409 }
+      )
+    }
 
     const newCollection = await db.collection.create({
       data: {
@@ -41,19 +59,18 @@ export async function POST(request: Request) {
         sourceType: sourceType as SourceType,
         originalUrl,
         syncFrequency,
-        userId: session.user.id!,
+        userId: session.user.id,
         lastSyncTime: new Date(),
       },
     })
 
-    if (items && items.length > 0) {
+    if ((items && items.length > 0) || content) {
       switch (sourceType) {
         case 'OFFICIAL_DOC':
           await db.docItem.createMany({
             data: items.map((item: any) => ({
               ...item,
               collectionId: newCollection.id,
-              lastSyncTime: new Date(),
             })),
           })
           break
@@ -71,12 +88,12 @@ export async function POST(request: Request) {
           })
           break
         case 'GITHUB':
-          await db.githubItem.createMany({
-            data: items.map((item: any) => ({
-              ...item,
+          await db.githubItem.create({
+            data: {
+              ...metadata,
+              readme: content,
               collectionId: newCollection.id,
-              lastSyncTime: new Date(),
-            })),
+            },
           })
           break
       }
@@ -85,6 +102,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, collection: newCollection })
   } catch (error) {
     console.error('Failed to create collection', error)
+    if (error instanceof Error && (error as any).code === 'P2002') {
+      return NextResponse.json(
+        { success: false, error: 'A collection with this unique identifier already exists.' },
+        { status: 409 }
+      )
+    }
     return NextResponse.json({ success: false, error: 'Failed to create collection' }, { status: 500 })
   }
 }

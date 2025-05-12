@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
 
 import './globals.css'
+import 'highlight.js/styles/github.css'
 
 import { auth } from '@/auth'
 

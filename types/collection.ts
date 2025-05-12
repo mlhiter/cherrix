@@ -28,9 +28,11 @@ export interface BlogItem {
 export interface GithubItem {
   id: string
   title: string
-  content: string
   url: string
   stars: number
+  forks?: number
+  language?: string
+  readme?: string
   lastSyncTime: Date
 }
 

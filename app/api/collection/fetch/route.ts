@@ -14,20 +14,17 @@ async function fetchOfficialDoc(url: string) {
     const html = await response.text()
     const $ = cheerio.load(html)
 
-    // 移除不需要的元素
     $('script, style, nav, footer, header').remove()
 
-    // 获取主要内容
     const content = $('main, article, .content, #content').text().trim() || $('body').text().trim()
 
-    // 获取标题
     const title = $('h1').first().text().trim() || $('title').text().trim()
 
     return {
       content,
       metadata: {
         title,
-        lastUpdated: new Date().toISOString(),
+        lastSyncTime: new Date().toISOString(),
         url,
       },
     }
@@ -54,7 +51,7 @@ async function fetchRssBlog(url: string) {
       metadata: {
         feedTitle: feed.title,
         feedDescription: feed.description,
-        lastUpdated: new Date().toISOString(),
+        lastSyncTime: new Date(),
         postCount: items.length,
       },
     }
@@ -66,7 +63,6 @@ async function fetchRssBlog(url: string) {
 // TODO: fetch the content from the Github repository
 async function fetchGithub(url: string) {
   try {
-    // 从 URL 中提取仓库信息
     const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/)
     if (!match) {
       throw new Error('Invalid GitHub URL')
@@ -74,13 +70,11 @@ async function fetchGithub(url: string) {
 
     const [, owner, repo] = match
 
-    // 获取仓库信息
     const { data: repoData } = await octokit.repos.get({
       owner,
       repo,
     })
 
-    // 获取 README 内容
     const { data: readmeData } = await octokit.repos.getReadme({
       owner,
       repo,
@@ -91,11 +85,11 @@ async function fetchGithub(url: string) {
     return {
       content: readmeContent,
       metadata: {
-        repoName: repoData.full_name,
+        name: repoData.full_name,
         description: repoData.description,
         stars: repoData.stargazers_count,
         forks: repoData.forks_count,
-        lastUpdated: repoData.updated_at,
+        lastSyncTime: new Date(),
         url: repoData.html_url,
       },
     }
