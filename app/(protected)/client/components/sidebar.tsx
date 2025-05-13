@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
-import { Boxes, Code, File, MessageCircle, Notebook, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Boxes, Code, File, MessageCircle, Notebook, ChevronLeft, Menu } from 'lucide-react'
 
 import { LinkButton } from './link-button'
 import { ResourceList } from './resource-list'
@@ -34,7 +34,7 @@ export const Sidebar = () => {
       {isCodePage && (
         <div className="flex justify-end">
           <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="h-10 w-12">
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {collapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
       )}
