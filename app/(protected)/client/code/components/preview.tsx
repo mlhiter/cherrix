@@ -23,7 +23,14 @@ export const Preview = ({ iframeUrl }: PreviewProps) => {
   const { status } = useWebContainerStore()
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
+    <div
+      className="flex h-full w-full flex-col overflow-hidden transition-all duration-300 ease-in-out"
+      style={{
+        // 保留动画过渡属性
+        transitionProperty: 'all',
+        transitionDuration: '300ms',
+        transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      }}>
       {collapsed ? (
         // 折叠状态 - 显示垂直标题和按钮
         <button
