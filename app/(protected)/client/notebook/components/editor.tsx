@@ -102,7 +102,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
   }, [editor, onSave])
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full w-full flex-col overflow-hidden">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold">{note?.title || 'Untitled Note'}</h1>
@@ -125,7 +125,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
         </div>
         {isSaving && <span className="text-sm text-gray-500">Saving...</span>}
       </div>
-      <div className="flex-1">
+      <div className="flex-1 overflow-auto">
         <BlockNoteView editor={editor} theme="light" />
       </div>
     </div>
