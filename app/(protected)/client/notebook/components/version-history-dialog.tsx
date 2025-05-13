@@ -145,24 +145,22 @@ export function VersionHistoryDialog({ open, onOpenChange, noteId, onVersionRest
                 </TableHeader>
                 <TableBody>
                   {versions.map((version) => (
-                    <TableRow key={version.id} className={previewVersion?.id === version.id ? 'bg-muted' : ''}>
+                    <TableRow
+                      key={version.id}
+                      className={`${previewVersion?.id === version.id ? 'bg-muted' : ''} cursor-pointer hover:bg-muted/50`}
+                      onClick={() => handlePreviewVersion(version)}>
                       <TableCell>{version.title}</TableCell>
                       <TableCell>{format(new Date(version.createdAt), 'yyyy-MM-dd HH:mm:ss')}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => handlePreviewVersion(version)}>
-                            <Eye className="h-4 w-4" />
-                            <span className="sr-only">Preview</span>
-                          </Button>
+                        <div className="flex justify-end">
                           <Button
                             variant="outline"
                             size="sm"
                             className="h-8 gap-1"
-                            onClick={() => handleRestoreVersion(version.id)}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleRestoreVersion(version.id)
+                            }}
                             disabled={isRestoring}>
                             {isRestoring && selectedVersionId === version.id ? (
                               <Loader2 className="h-3 w-3 animate-spin" />
