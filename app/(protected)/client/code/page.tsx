@@ -121,7 +121,7 @@ function CodePageContent() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex h-full flex-col gap-4">
       <PanelGroup direction="horizontal" className="flex-1">
         {/* File Explorer */}
         <Panel defaultSize={20} minSize={10} className="rounded-lg border border-gray-200">
