@@ -2,6 +2,7 @@
 
 import { Loader } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSidebarContext } from '../context/sidebar-context'
 import { PreviewProvider, usePreviewContext } from '../context/preview-context'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
@@ -14,6 +15,8 @@ import { CodeEditor, EditorRef } from './components/code-editor'
 import { initialFiles } from '@/constants/code'
 import { getWebContainerInstance } from '@/lib/webcontainer'
 import { useWebContainerStore } from '@/stores/web-container'
+import { useCodeStore } from '@/stores/code'
+import { FileSystemTree } from '@webcontainer/api'
 
 function ResizeHandle({ className = '', ...props }: { className?: string; [key: string]: any }) {
   return (
@@ -36,6 +39,7 @@ function VerticalResizeHandle({ className = '', ...props }: { className?: string
 }
 
 function CodePageContent() {
+  const searchParams = useSearchParams()
   const editorRef = useRef<EditorRef>(null)
   const [loading, setLoading] = useState(true)
   const [iframeUrl, setIframeUrl] = useState<string>('')
@@ -44,6 +48,7 @@ function CodePageContent() {
   const initialLoadRef = useRef(true)
   const previewPanelRef = useRef<any>(null)
   const [animating, setAnimating] = useState(false)
+  const { files, setFiles } = useCodeStore()
 
   const { instance, setInstance, setStatus } = useWebContainerStore()
 
@@ -59,7 +64,9 @@ function CodePageContent() {
           setIframeUrl(url)
         })
 
-        await webcontainerInstance.mount(initialFiles)
+        const webcontainerFiles = files ? files : initialFiles
+
+        await webcontainerInstance.mount(webcontainerFiles as FileSystemTree)
 
         setInstance(webcontainerInstance)
       } catch (error) {
@@ -167,7 +174,6 @@ function CodePageContent() {
     </div>
   )
 }
-
 export default function CodePage() {
   return (
     <PreviewProvider initialCollapsed={false}>

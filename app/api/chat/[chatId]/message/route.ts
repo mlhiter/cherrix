@@ -102,8 +102,8 @@ export async function POST(req: Request, { params }: { params: { chatId: string 
     // Get AI response
     const result = streamText({
       model: createOpenAI({
-        apiKey: apiKeyConfig.apiKey,
-        baseURL: apiKeyConfig.baseUrl,
+        apiKey: apiKeyConfig.apiKey as string,
+        baseURL: apiKeyConfig.baseUrl as string,
       })(apiKeyConfig.modelId as string),
       system: SYSTEM_PROMPT(context),
       messages: convertToCoreMessages(messages),

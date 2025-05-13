@@ -1,11 +1,12 @@
 'use client'
 
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { BlockNoteView } from '@blocknote/mantine'
 import { useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteEditor, PartialBlock } from '@blocknote/core'
-import { EllipsisVerticalIcon, FileUp, FileDown, History } from 'lucide-react'
+import { EllipsisVerticalIcon, FileUp, FileDown, History, Code } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,10 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { toast } from 'sonner'
 
 import '@blocknote/mantine/style.css'
 import '@blocknote/core/fonts/inter.css'
 import { VersionHistoryDialog } from './version-history-dialog'
+import { useCodeStore } from '@/stores/code'
 
 interface Note {
   id: string
@@ -43,11 +46,13 @@ interface EditorProps {
 }
 
 export default function Editor({ note, collaborators, isSaving, onSaveAction: onSave }: EditorProps) {
+  const router = useRouter()
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [importConfirmOpen, setImportConfirmOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false)
+  const setFiles = useCodeStore((state) => state.setFiles)
 
   const handleFileUpload = async (file: File): Promise<string> => {
     try {
@@ -145,26 +150,43 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
     }
   }
 
-  useEffect(() => {
-    const handleChange = () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current)
-      }
+  const generateCode = async () => {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const markdown = await editor.blocksToMarkdownLossy(editor.document)
+        const response = await fetch('/api/note/generate-code', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: markdown,
+            noteId: note.id,
+          }),
+        })
 
-      saveTimeoutRef.current = setTimeout(() => {
-        const content = JSON.stringify(editor.document)
-        onSave(content)
-      }, 30000)
-    }
+        if (!response.ok) {
+          throw new Error('Failed to generate code')
+        }
 
-    editor.domElement?.addEventListener('input', handleChange)
-    return () => {
-      editor.domElement?.removeEventListener('input', handleChange)
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current)
+        const files = await response.json()
+        setFiles(files)
+        resolve(files)
+      } catch (error) {
+        console.error('Error generating code:', error)
+        reject(new Error('Failed to generate code'))
       }
-    }
-  }, [editor, onSave])
+    })
+
+    toast.promise(promise, {
+      loading: '正在生成代码...',
+      success: () => {
+        router.push('/client/code')
+        return '代码生成成功！正在跳转...'
+      },
+      error: '代码生成失败，请重试',
+    })
+  }
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -183,6 +205,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
       <div className="relative flex items-center justify-between pb-4">
         <div className="w-10"></div>
         <h1 className="flex-1 text-center text-2xl font-bold">{note?.title || 'Untitled Note'}</h1>
+        {isSaving && <div className="mr-4 text-sm text-muted-foreground">Saving...</div>}
         <div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -191,6 +214,10 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={generateCode}>
+                <Code className="mr-2 h-4 w-4" />
+                Generate Code
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setHistoryDialogOpen(true)}>
                 <History className="mr-2 h-4 w-4" />
                 Version History
@@ -234,7 +261,19 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
       </div>
 
       <div className="mt-4 flex-1 overflow-auto">
-        <BlockNoteView editor={editor} theme="light" />
+        <BlockNoteView
+          editor={editor}
+          theme="light"
+          onChange={() => {
+            if (saveTimeoutRef.current) {
+              clearTimeout(saveTimeoutRef.current)
+            }
+            saveTimeoutRef.current = setTimeout(() => {
+              const content = JSON.stringify(editor.document)
+              onSave(content)
+            }, 10000)
+          }}
+        />
       </div>
 
       <Dialog open={importConfirmOpen} onOpenChange={setImportConfirmOpen}>
