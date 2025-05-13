@@ -28,7 +28,15 @@ export default function CollectionPage() {
       const data = await response.json()
 
       if (data.success) {
-        setItems(data.collections)
+        setItems(
+          data.collections
+            .map((collection: any) => ({
+              ...collection,
+              isVectorized: Boolean(collection.isVectorized),
+              lastSyncTime: new Date(collection.lastSyncTime),
+            }))
+            .sort((a: any, b: any) => b.lastSyncTime.getTime() - a.lastSyncTime.getTime())
+        )
       } else {
         throw new Error(data.error || 'Failed to fetch collections')
       }

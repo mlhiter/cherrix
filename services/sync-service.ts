@@ -31,6 +31,24 @@ async function syncCollectionItem(item: CollectionItem) {
       }),
     })
 
+    try {
+      const vectorizeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/collection/vectorize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          collectionId: item.id,
+        }),
+      })
+
+      if (!vectorizeResponse.ok) {
+        console.error(`Failed to vectorize collection ${item.name}:`, await vectorizeResponse.text())
+      }
+    } catch (vectorizeError) {
+      console.error(`Failed to vectorize collection ${item.name}:`, vectorizeError)
+    }
+
     console.log(`Successfully synced collection item: ${item.name}`)
   } catch (error) {
     console.error(`Failed to sync collection item ${item.name}:`, error)

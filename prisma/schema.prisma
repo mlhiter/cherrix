@@ -140,6 +140,7 @@ model Collection {
   docItems      DocItem[]
   blogItems     BlogItem[]
   githubItems   GithubItem[]
+  isVectorized  Boolean     @default(false)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 

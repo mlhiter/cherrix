@@ -1,10 +1,12 @@
 import { formatDistanceToNow } from 'date-fns'
-import { Eye, Trash, RefreshCw, Loader2, Boxes } from 'lucide-react'
+import { Eye, Trash, RefreshCw, Loader2, Boxes, Cpu, EllipsisVerticalIcon } from 'lucide-react'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { EmptyState } from '@/components/empty-state'
 import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import { CollectionItem } from '@/types/collection'
 
@@ -20,7 +22,7 @@ export function CollectionList({ items, onView, onDelete, onSync, isLoading = fa
   return (
     <Card className="flex-1 p-4">
       <div className="flex min-h-10 items-center justify-between">
-        <h2 className="text-xl font-semibold">Collection List</h2>
+        <h2 className="text-xl font-semibold">List</h2>
       </div>
       <div className="w-full">
         {isLoading ? (
@@ -32,7 +34,7 @@ export function CollectionList({ items, onView, onDelete, onSync, isLoading = fa
             title="No Collections"
             description="You haven't created any collections yet. Start by adding a new collection."
             icon={Boxes}
-            className="h-[350px]"
+            className="h-[300px]"
           />
         ) : (
           <Table>
@@ -40,64 +42,71 @@ export function CollectionList({ items, onView, onDelete, onSync, isLoading = fa
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Source Type</TableHead>
-                <TableHead>Original URL</TableHead>
-                <TableHead>Last Sync Time</TableHead>
-                <TableHead>Sync Frequency</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
+                <TableHead>Last Synced</TableHead>
+                <TableHead>Vector Status</TableHead>
+                <TableHead className="w-[100px]">Operation</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {items.map((item) => (
-                <TableRow key={item.id} className="cursor-pointer hover:bg-muted/50" onClick={() => onView(item)}>
-                  <TableCell>{item.name}</TableCell>
+                <TableRow key={item.id} className="cursor-pointer" onClick={() => onView(item)}>
+                  <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>
-                    {item.sourceType === 'OFFICIAL_DOC'
-                      ? 'Official Document'
-                      : item.sourceType === 'RSS_BLOG'
-                        ? 'RSS Blog'
-                        : 'Github'}
-                  </TableCell>
-                  <TableCell>
-                    <a
-                      href={item.originalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                      onClick={(e) => e.stopPropagation()}>
-                      {item.originalUrl}
-                    </a>
+                    <Badge variant="outline">{item.sourceType}</Badge>
                   </TableCell>
                   <TableCell>
                     {formatDistanceToNow(new Date(item.lastSyncTime), {
                       addSuffix: true,
                     })}
                   </TableCell>
-                  <TableCell>{item.syncFrequency}</TableCell>
-                  <TableCell className="flex justify-end space-x-1" onClick={(e) => e.stopPropagation()}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 hover:text-green-600"
-                      onClick={() => onView(item)}
-                      title="View">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 hover:text-blue-500"
-                      onClick={() => onSync(item.id)}
-                      title="Sync Now">
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => onDelete(item.id)}
-                      title="Delete">
-                      <Trash className="h-4 w-4" />
-                    </Button>
+                  <TableCell>
+                    {item.isVectorized ? (
+                      <Badge variant="secondary" className="gap-1">
+                        <Cpu className="h-3 w-3" /> Vectorized
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-muted-foreground">
+                        Not Vectorized
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <EllipsisVerticalIcon className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onView(item)
+                            }}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onSync(item.id)
+                            }}>
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Sync
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              onDelete(item.id)
+                            }}
+                            className="text-destructive transition-colors duration-200 hover:bg-destructive/10 focus:bg-destructive/10 focus:text-destructive">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

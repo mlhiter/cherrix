@@ -10,12 +10,12 @@ export interface CollectionSource {
 export interface DocItem {
   id: string
   title: string
-  content: string
-  textContent?: string
+  content: string | null
+  textContent?: string | null
   url: string
   lastSyncTime: Date
-  lastUpdated?: string
-  baseUrl?: string
+  lastUpdated?: string | null
+  baseUrl?: string | null
   tableOfContents?: Array<{
     text: string
     url: string
@@ -23,28 +23,30 @@ export interface DocItem {
   }>
   images?: Array<{
     url: string
-    alt: string
+    alt?: string | null
   }>
 }
 
 export interface BlogItem {
   id: string
   title: string
-  content: string
+  content: string | null
   url: string
-  publishDate: Date
-  author: string
+  publishDate?: Date | null
+  author?: string | null
   lastSyncTime: Date
 }
 
 export interface GithubItem {
   id: string
-  title: string
+  name: string
   url: string
-  stars: number
-  forks?: number
-  language?: string
-  readme?: string
+  readme?: string | null
+  description?: string | null
+  stars?: number | null
+  forks?: number | null
+  language?: string | null
+  topics?: string[]
   lastSyncTime: Date
 }
 
@@ -56,6 +58,7 @@ export interface CollectionItem {
   syncFrequency: 'daily' | 'weekly' | 'monthly'
   lastSyncTime: Date
   userId: string
+  isVectorized: boolean
   docItems?: DocItem[]
   blogItems?: BlogItem[]
   githubItems?: GithubItem[]

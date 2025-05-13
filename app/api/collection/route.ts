@@ -122,6 +122,43 @@ export async function POST(request: Request) {
         break
     }
 
+    try {
+      const fullCollection = await db.collection.findUnique({
+        where: { id: collection.id },
+        include: {
+          docItems: {
+            include: {
+              images: true,
+              tableOfContents: true,
+            },
+          },
+          blogItems: true,
+          githubItems: true,
+        },
+      })
+
+      if (fullCollection) {
+        const vectorizeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/collection/vectorize`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            collectionId: collection.id,
+          }),
+        })
+
+        if (vectorizeResponse.ok) {
+          await db.collection.update({
+            where: { id: collection.id },
+            data: { isVectorized: true },
+          })
+        }
+      }
+    } catch (vectorizeError) {
+      console.error('Auto-vectorization failed:', vectorizeError)
+    }
+
     return NextResponse.json({ success: true, collection })
   } catch (error) {
     console.error('Failed to create collection', error)
