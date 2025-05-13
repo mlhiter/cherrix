@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useRef } from 'react'
 import { BlockNoteView } from '@blocknote/mantine'
 import { useCreateBlockNote } from '@blocknote/react'
@@ -32,6 +33,29 @@ interface EditorProps {
 export default function Editor({ note, collaborators, isSaving, onSaveAction: onSave }: EditorProps) {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+  const handleFileUpload = async (file: File): Promise<string> => {
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/note/upload-file', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Upload failed')
+      }
+
+      const data = await response.json()
+
+      return data.url
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      throw new Error('Failed to upload file')
+    }
+  }
+
   const editor = useCreateBlockNote({
     initialContent: note?.content
       ? (JSON.parse(note.content) as PartialBlock[])
@@ -41,6 +65,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
             content: 'Welcome to your new notebook!',
           },
         ] as PartialBlock[]),
+    uploadFile: handleFileUpload,
   }) as BlockNoteEditor
 
   useEffect(() => {
@@ -84,7 +109,15 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
           <div className="flex items-center gap-2">
             {(collaborators || []).map((user) => (
               <div key={user.id} className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1">
-                {user.image && <img src={user.image} alt={user.name || 'User'} className="h-6 w-6 rounded-full" />}
+                {user.image && (
+                  <Image
+                    src={user.image}
+                    alt={user.name || 'User'}
+                    className="h-6 w-6 rounded-full"
+                    width={24}
+                    height={24}
+                  />
+                )}
                 <span className="text-sm text-gray-600">{user.name || 'Anonymous'}</span>
               </div>
             ))}
