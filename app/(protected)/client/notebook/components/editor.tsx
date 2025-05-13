@@ -154,7 +154,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
       saveTimeoutRef.current = setTimeout(() => {
         const content = JSON.stringify(editor.document)
         onSave(content)
-      }, 1000)
+      }, 30000)
     }
 
     editor.domElement?.addEventListener('input', handleChange)

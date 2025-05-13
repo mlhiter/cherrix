@@ -45,7 +45,7 @@ export async function POST(req: Request, { params }: { params: { noteId: string;
 
     await db.noteVersion.create({
       data: {
-        title: `Version ${nextVersionNumber} (Restore before)`,
+        title: `Version ${nextVersionNumber} (Restored to Version ${version.versionNumber})`,
         content: note.content,
         noteId: note.id,
         userId: session.user.id,
