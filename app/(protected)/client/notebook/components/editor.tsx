@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BlockNoteView } from '@blocknote/mantine'
 import { useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteEditor, PartialBlock } from '@blocknote/core'
-import { EllipsisVerticalIcon, FileUp, FileDown } from 'lucide-react'
+import { EllipsisVerticalIcon, FileUp, FileDown, History } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +19,7 @@ import {
 
 import '@blocknote/mantine/style.css'
 import '@blocknote/core/fonts/inter.css'
+import { VersionHistoryDialog } from './version-history-dialog'
 
 interface Note {
   id: string
@@ -46,6 +47,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
   const [importConfirmOpen, setImportConfirmOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false)
 
   const handleFileUpload = async (file: File): Promise<string> => {
     try {
@@ -133,6 +135,16 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
     }
   }
 
+  const handleVersionRestore = (content: string) => {
+    try {
+      const parsedContent = JSON.parse(content) as PartialBlock[]
+      editor.replaceBlocks(editor.document, parsedContent)
+      onSave(content)
+    } catch (error) {
+      console.error('Error restoring version:', error)
+    }
+  }
+
   useEffect(() => {
     const handleChange = () => {
       if (saveTimeoutRef.current) {
@@ -179,6 +191,10 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setHistoryDialogOpen(true)}>
+                <History className="mr-2 h-4 w-4" />
+                Version History
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                 <FileUp className="mr-2 h-4 w-4" />
                 Import Markdown
@@ -238,6 +254,13 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <VersionHistoryDialog
+        open={historyDialogOpen}
+        onOpenChange={setHistoryDialogOpen}
+        noteId={note?.id}
+        onVersionRestore={handleVersionRestore}
+      />
     </div>
   )
 }

@@ -18,8 +18,6 @@ export async function GET(req: Request, { params }: { params: { noteId: string }
       },
     })
 
-    console.log('note', note)
-
     if (!note) {
       return new NextResponse('Not Found', { status: 404 })
     }
@@ -46,6 +44,38 @@ export async function PATCH(req: Request, { params }: { params: { noteId: string
     }
 
     const { title, content, isPublic, collaborators } = await req.json()
+
+    const currentNote = await db.note.findUnique({
+      where: {
+        id: noteId,
+        OR: [{ userId: session.user.id }, { collaborators: { some: { id: session.user.id } } }],
+      },
+    })
+
+    if (!currentNote) {
+      return NextResponse.json({ error: 'Note not found' }, { status: 404 })
+    }
+
+    const latestVersion = await db.noteVersion.findFirst({
+      where: { noteId },
+      orderBy: {
+        versionNumber: 'desc',
+      },
+    })
+
+    if (currentNote.content !== content) {
+      const nextVersionNumber = latestVersion ? latestVersion.versionNumber + 1 : 1
+
+      await db.noteVersion.create({
+        data: {
+          title: `Version ${nextVersionNumber}`,
+          content: currentNote.content,
+          noteId: currentNote.id,
+          userId: session.user.id,
+          versionNumber: nextVersionNumber,
+        },
+      })
+    }
 
     const note = await db.note.update({
       where: {

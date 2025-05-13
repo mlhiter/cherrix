@@ -227,16 +227,31 @@ model GithubItem {
 }
 
 model Note {
+  id            String          @id @default(cuid())
+  title         String
+  content       String          @db.Text
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isPublic      Boolean         @default(false)
+  collaborators User[]          @relation("NoteCollaborators")
+  versions      NoteVersion[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([userId])
+}
+
+model NoteVersion {
   id            String    @id @default(cuid())
   title         String
   content       String    @db.Text
+  noteId        String
+  note          Note      @relation(fields: [noteId], references: [id], onDelete: Cascade)
   userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isPublic      Boolean   @default(false)
-  collaborators User[]    @relation("NoteCollaborators")
+  versionNumber Int
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 
+  @@index([noteId])
   @@index([userId])
 }
 

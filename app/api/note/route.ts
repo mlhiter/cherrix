@@ -24,6 +24,15 @@ export async function POST(req: Request) {
         },
       },
     })
+    await db.noteVersion.create({
+      data: {
+        title: `Version 1`,
+        content: JSON.stringify(content),
+        noteId: note.id,
+        userId: session.user.id,
+        versionNumber: 1,
+      },
+    })
 
     return NextResponse.json(note)
   } catch (error) {

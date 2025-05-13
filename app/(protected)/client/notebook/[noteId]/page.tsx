@@ -1,7 +1,6 @@
 'use client'
 
 import { toast } from 'sonner'
-import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Loader2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
