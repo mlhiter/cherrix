@@ -2,6 +2,7 @@
 
 import { Loader } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { useSidebarContext } from '../context/sidebar-context'
 
 import { Preview } from './components/preview'
 import { Terminal } from './components/terminal'
@@ -16,6 +17,8 @@ export default function CodePage() {
   const editorRef = useRef<EditorRef>(null)
   const [loading, setLoading] = useState(true)
   const [iframeUrl, setIframeUrl] = useState<string>('')
+  const { collapsed, setCollapsed } = useSidebarContext()
+  const initialLoadRef = useRef(true)
 
   const { instance, setInstance, setStatus } = useWebContainerStore()
 
@@ -52,6 +55,19 @@ export default function CodePage() {
       }
     }
   }, [])
+
+  // Side-effect to auto-collapse sidebar ONLY on initial component mount
+  useEffect(() => {
+    // Only auto-collapse on initial mount, not on every render or state change
+    if (initialLoadRef.current) {
+      const timer = setTimeout(() => {
+        setCollapsed(true)
+        initialLoadRef.current = false
+      }, 500) // Small delay to ensure UI is rendered first
+
+      return () => clearTimeout(timer)
+    }
+  }, [setCollapsed])
 
   if (loading) {
     return (
