@@ -1,6 +1,7 @@
 'use client'
 
 import { toast } from 'sonner'
+import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Loader2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
@@ -101,7 +102,28 @@ export default function NotePage() {
 
   return (
     <div className="h-full flex-1 overflow-hidden">
-      <Editor note={note} collaborators={collaborators} isSaving={isSaving} onSaveAction={saveNote} />
+      <div className="flex h-full w-full flex-col overflow-hidden">
+        <div className="flex flex-col items-center justify-between pb-4">
+          <h1 className="text-center text-2xl font-bold">{note?.title || 'Untitled Note'}</h1>
+          <div className="mt-2 flex items-center gap-2">
+            {(collaborators || []).map((user) => (
+              <div key={user.id} className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1">
+                {user.image && (
+                  <Image
+                    src={user.image}
+                    alt={user.name || 'User'}
+                    className="h-6 w-6 rounded-full"
+                    width={24}
+                    height={24}
+                  />
+                )}
+                <span className="text-sm text-gray-600">{user.name || 'Anonymous'}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <Editor note={note} collaborators={collaborators} isSaving={isSaving} onSaveAction={saveNote} />
+      </div>
     </div>
   )
 }

@@ -102,32 +102,8 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
   }, [editor, onSave])
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden">
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">{note?.title || 'Untitled Note'}</h1>
-          <div className="flex items-center gap-2">
-            {(collaborators || []).map((user) => (
-              <div key={user.id} className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1">
-                {user.image && (
-                  <Image
-                    src={user.image}
-                    alt={user.name || 'User'}
-                    className="h-6 w-6 rounded-full"
-                    width={24}
-                    height={24}
-                  />
-                )}
-                <span className="text-sm text-gray-600">{user.name || 'Anonymous'}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        {isSaving && <span className="text-sm text-gray-500">Saving...</span>}
-      </div>
-      <div className="flex-1 overflow-auto">
-        <BlockNoteView editor={editor} theme="light" />
-      </div>
+    <div className="flex-1 overflow-auto">
+      <BlockNoteView editor={editor} theme="light" />
     </div>
   )
 }
