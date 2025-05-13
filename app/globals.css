@@ -210,3 +210,9 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.bn-container a {
+  text-decoration: underline;
+  color: #0969da;
+  cursor: pointer;
+}
