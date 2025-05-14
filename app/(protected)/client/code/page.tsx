@@ -64,7 +64,7 @@ function CodePageContent() {
           setIframeUrl(url)
         })
 
-        const webcontainerFiles = files ? files : initialFiles
+        const webcontainerFiles = initialFiles
 
         await webcontainerInstance.mount(webcontainerFiles as FileSystemTree)
 
