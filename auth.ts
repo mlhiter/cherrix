@@ -65,11 +65,14 @@ export const {
       if (token.isTwoFactorEnabled && session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
       }
+      console.log('token', token)
+      console.log('session', session)
 
       if (session.user) {
         session.user.name = token.name
         session.user.email = token.email as string
         session.user.isOAuth = token.isOAuth as boolean
+        session.user.image = token.picture as string
       }
       return session
     },
@@ -83,6 +86,7 @@ export const {
       if (!existingUser) return token
 
       token.isOAuth = !!existingAccount
+      token.picture = existingUser.image // token use picture for image
       token.name = existingUser.name
       token.email = existingUser.email
       token.role = existingUser.role

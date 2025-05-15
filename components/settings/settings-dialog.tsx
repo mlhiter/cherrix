@@ -1,51 +1,46 @@
 'use client'
 
 import * as z from 'zod'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSession } from 'next-auth/react'
-import { useState, useTransition } from 'react'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ApiKey, UserRole } from '@prisma/client'
+import { useDebounceCallback } from 'usehooks-ts'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, SettingsIcon, Upload } from 'lucide-react'
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { FormError } from '@/components/form-error'
-import { FormSuccess } from '@/components/form-success'
+import { ChangePasswordDialog } from './change-password-dialog'
 import { ApiKeyForm } from '@/components/api-keys/api-key-form'
 import { ApiKeyList } from '@/components/api-keys/api-key-list'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { FormControl, FormField, FormItem, FormLabel, Form, FormMessage, FormDescription } from '@/components/ui/form'
+import { FormControl, FormField, Form } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import { SettingsSchema } from '@/schemas'
-import { settings } from '@/actions/settings'
 import { useCurrentUser } from '@/hooks/use-current-user'
 
 export const SettingsDialog = () => {
   const user = useCurrentUser()
   const [error, setError] = useState<string | undefined>()
-  const [success, setSuccess] = useState<string | undefined>()
   const { update } = useSession()
-  const [isPending, startTransition] = useTransition()
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false)
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
 
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
       name: user?.name || '',
-      email: user?.email || '',
-      password: '',
-      newPassword: '',
-      isTwoFactorEnabled: user?.isTwoFactorEnabled || false,
       role: user?.role || UserRole.USER,
+      isTwoFactorEnabled: user?.isTwoFactorEnabled || false,
+      image: user?.image || '',
     },
   })
 
@@ -62,29 +57,9 @@ export const SettingsDialog = () => {
     }
   }
 
-  const onSubmit = (values: z.infer<typeof SettingsSchema>) => {
-    startTransition(() => {
-      settings(values)
-        .then((data) => {
-          if (data.error) {
-            setError(data.error)
-          }
-          if (data.success) {
-            update()
-            setSuccess(data.success)
-          }
-        })
-        .catch(() => {
-          setError('Something went wrong')
-        })
-    })
-  }
-
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setAvatarFile(e.target.files[0])
       setIsUploading(true)
-
       const formData = new FormData()
       formData.append('file', e.target.files[0])
 
@@ -101,9 +76,9 @@ export const SettingsDialog = () => {
 
         const data = await response.json()
         if (data.success) {
+          const newValues = { ...form.getValues(), image: data.url }
           form.setValue('image', data.url)
-          setSuccess('Avatar uploaded successfully')
-          update()
+          handleSettingChange(newValues)
         } else {
           throw new Error(data.details || 'Upload failed')
         }
@@ -114,6 +89,30 @@ export const SettingsDialog = () => {
       }
     }
   }
+
+  const handleSettingChange = async (values: z.infer<typeof SettingsSchema>) => {
+    console.log('handleSettingChange')
+    try {
+      const response = await fetch('/api/user', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      })
+
+      const data = await response.json()
+      if (data.error) {
+        setError(data.error)
+        return
+      }
+
+      update()
+    } catch (error) {
+      setError('Failed to update settings')
+    }
+  }
+  const debouncedSettingChange = useDebounceCallback(handleSettingChange, 2000)
 
   return (
     <Dialog>
@@ -134,114 +133,99 @@ export const SettingsDialog = () => {
           </TabsList>
           <TabsContent value="general">
             <Form {...form}>
-              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col gap-y-4">
-                        <FormLabel>Avatar</FormLabel>
+              <div className="space-y-4">
+                {/* avatar */}
+                <div className="flex items-center gap-x-6 py-2">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={user?.image || ''} />
+                    <AvatarFallback className="text-lg">{user?.name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col gap-y-1">
+                    <h4 className="text-sm font-medium">Profile Picture</h4>
+                    <p className="text-xs text-muted-foreground">Change your profile picture</p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isUploading}
+                      onClick={() => document.getElementById('avatar-upload')?.click()}>
+                      <Upload className="mr-2 h-4 w-4" />
+                      {isUploading ? 'Uploading...' : 'Upload'}
+                    </Button>
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                  </div>
+                </div>
+
+                {/* username */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-medium">User Name</label>
+                      <p className="text-xs text-muted-foreground">This is your username</p>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
                         <FormControl>
-                          <div className="flex items-center gap-x-4">
-                            <Avatar className="h-20 w-20">
-                              <AvatarImage src={field.value || user?.image || ''} />
-                              <AvatarFallback className="text-lg">
-                                {user?.name?.[0]?.toUpperCase() || '?'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                disabled={isUploading}
-                                onClick={() => document.getElementById('avatar-upload')?.click()}>
-                                <Upload className="mr-2 h-4 w-4" />
-                                {isUploading ? 'Uploading...' : 'Upload Avatar'}
-                              </Button>
-                              <input
-                                id="avatar-upload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleAvatarChange}
-                              />
-                            </div>
-                          </div>
+                          <Input
+                            placeholder="Name"
+                            className="max-w-[200px]"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e)
+                              debouncedSettingChange(form.getValues())
+                            }}
+                          />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Name" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      )}
+                    />
+                  </div>
+
+                  {/* email */}
+                  <div className="flex items-center justify-between py-2">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-medium">Email</label>
+                      <p className="text-xs text-muted-foreground">Your email address</p>
+                    </div>
+                    <Input value={user?.email || ''} disabled className="max-w-[200px] bg-muted" />
+                  </div>
+
+                  {/* password */}
                   {user?.isOAuth === false && (
-                    <>
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="Email" type="email" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="******" type="password" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="newPassword"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>New Password</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="******" type="password" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </>
+                    <div className="flex items-center justify-between py-2">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">Password</label>
+                        <p className="text-xs text-muted-foreground">Change your password</p>
+                      </div>
+                      <ChangePasswordDialog />
+                    </div>
                   )}
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role</FormLabel>
+
+                  {/* role */}
+                  <div className="flex items-center justify-between py-2">
+                    <div className="space-y-0.5">
+                      <label className="text-sm font-medium">Role</label>
+                      <p className="text-xs text-muted-foreground">Your account role</p>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="role"
+                      render={({ field }) => (
                         <Select
-                          {...field}
-                          disabled={isPending}
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}>
+                          defaultValue={field.value}
+                          onValueChange={(value) => {
+                            field.onChange(value)
+                            handleSettingChange(form.getValues())
+                          }}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-[200px]">
                               <SelectValue placeholder="Select a Role" />
                             </SelectTrigger>
                           </FormControl>
@@ -250,33 +234,39 @@ export const SettingsDialog = () => {
                             <SelectItem value={UserRole.USER}>User</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {user?.isOAuth === false && (
-                    <FormField
-                      control={form.control}
-                      name="isTwoFactorEnabled"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                          <div className="space-y-0.5">
-                            <FormLabel>Two Factor Authentication</FormLabel>
-                            <FormDescription>Enable two factor authentication for your account</FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch disabled={isPending} checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
                       )}
                     />
+                  </div>
+
+                  {/* two factor authentication */}
+                  {user?.isOAuth === false && (
+                    <div className="flex items-center justify-between py-2">
+                      <div className="space-y-0.5">
+                        <label className="text-sm font-medium">Two Factor Authentication</label>
+                        <p className="text-xs text-muted-foreground">
+                          Enable two factor authentication for your account
+                        </p>
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name="isTwoFactorEnabled"
+                        render={({ field }) => (
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked)
+                                handleSettingChange(form.getValues())
+                              }}
+                            />
+                          </FormControl>
+                        )}
+                      />
+                    </div>
                   )}
                 </div>
                 <FormError message={error} />
-                <FormSuccess message={success} />
-                <Button type="submit">Save</Button>
-              </form>
+              </div>
             </Form>
           </TabsContent>
           <TabsContent value="api-keys">
