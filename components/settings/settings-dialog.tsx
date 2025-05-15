@@ -1,7 +1,7 @@
 'use client'
 
 import * as z from 'zod'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSession } from 'next-auth/react'
 import { ApiKey, UserRole } from '@prisma/client'
@@ -14,8 +14,8 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { FormError } from '@/components/form-error'
 import { ChangePasswordDialog } from './change-password-dialog'
-import { ApiKeyForm } from '@/components/api-keys/api-key-form'
-import { ApiKeyList } from '@/components/api-keys/api-key-list'
+import { ApiKeyForm } from '@/components/settings/api-keys/api-key-form'
+import { ApiKeyList } from '@/components/settings/api-keys/api-key-list'
 import { FormControl, FormField, Form } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -56,6 +56,9 @@ export const SettingsDialog = () => {
       setIsLoading(false)
     }
   }
+  useEffect(() => {
+    fetchApiKeys()
+  }, [])
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -277,7 +280,7 @@ export const SettingsDialog = () => {
                   Add API Key
                 </Button>
               </div>
-              <ApiKeyList fetchApiKeys={fetchApiKeys} apiKeys={apiKeys} isLoading={isLoading} />
+              <ApiKeyList fetchApiKeysAction={fetchApiKeys} apiKeys={apiKeys} isLoading={isLoading} />
             </div>
           </TabsContent>
         </Tabs>

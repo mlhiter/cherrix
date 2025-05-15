@@ -5,20 +5,8 @@ import { ApiKey } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import { Edit, Trash } from 'lucide-react'
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { ApiKeyForm } from './api-key-form'
@@ -26,15 +14,10 @@ import { ApiKeyForm } from './api-key-form'
 type ApiKeyListProps = {
   apiKeys: ApiKey[]
   isLoading: boolean
-  fetchApiKeys: () => void
+  fetchApiKeysAction: () => void
 }
 
-export function ApiKeyList({
-  apiKeys,
-  isLoading,
-  fetchApiKeys,
-}: ApiKeyListProps) {
-  const router = useRouter()
+export function ApiKeyList({ apiKeys, isLoading, fetchApiKeysAction: fetchApiKeys }: ApiKeyListProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [editingKey, setEditingKey] = useState<string | null>(null)
 
@@ -109,12 +92,7 @@ export function ApiKeyList({
               <TableCell>{key.baseUrl}</TableCell>
               <TableCell>{key.modelId}</TableCell>
               <TableCell>
-                <Switch
-                  checked={key.isActive}
-                  onCheckedChange={(checked) =>
-                    handleToggleActive(key.id, checked)
-                  }
-                />
+                <Switch checked={key.isActive} onCheckedChange={(checked) => handleToggleActive(key.id, checked)} />
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
@@ -127,10 +105,7 @@ export function ApiKeyList({
                     }}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(key.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(key.id)}>
                     <Trash className="h-4 w-4" />
                   </Button>
                 </div>

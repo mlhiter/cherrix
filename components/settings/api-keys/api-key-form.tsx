@@ -5,14 +5,7 @@ import { useForm } from 'react-hook-form'
 import { useState, useTransition } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
@@ -34,11 +27,7 @@ type ApiKeyFormProps = {
   isEditing?: boolean
 }
 
-export function ApiKeyForm({
-  onSuccess,
-  defaultValues,
-  isEditing = false,
-}: ApiKeyFormProps) {
+export function ApiKeyForm({ onSuccess, defaultValues, isEditing = false }: ApiKeyFormProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | undefined>()
   const [success, setSuccess] = useState<string | undefined>()
@@ -60,10 +49,7 @@ export function ApiKeyForm({
 
     startTransition(async () => {
       try {
-        const url =
-          isEditing && defaultValues?.id
-            ? `/api/api-key/${defaultValues.id}`
-            : '/api/api-key'
+        const url = isEditing && defaultValues?.id ? `/api/api-key/${defaultValues.id}` : '/api/api-key'
 
         const response = await fetch(url, {
           method: isEditing ? 'PATCH' : 'POST',
@@ -153,11 +139,7 @@ export function ApiKeyForm({
                   <FormLabel className="text-base">Active</FormLabel>
                 </div>
                 <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isPending}
-                  />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isPending} />
                 </FormControl>
               </FormItem>
             )}
