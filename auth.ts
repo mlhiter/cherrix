@@ -65,8 +65,6 @@ export const {
       if (token.isTwoFactorEnabled && session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
       }
-      console.log('token', token)
-      console.log('session', session)
 
       if (session.user) {
         session.user.name = token.name
