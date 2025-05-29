@@ -113,6 +113,10 @@ const useResources = (type: ResourceType) => {
       })
       if (!response.ok) throw new Error(`Failed to rename ${type}`)
       setResources(resources.map((resource) => (resource.id === id ? { ...resource, title: newTitle } : resource)))
+
+      if (type === 'note') {
+        window.dispatchEvent(new CustomEvent('note-updated', { detail: { noteId: id } }))
+      }
     } catch (error) {
       console.error(`Error renaming ${type}:`, error)
     }

@@ -56,6 +56,11 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false)
   const setFiles = useCodeStore((state) => state.setFiles)
+  const [currentTitle, setCurrentTitle] = useState(note.title)
+
+  useEffect(() => {
+    setCurrentTitle(note.title)
+  }, [note.title])
 
   const handleFileUpload = async (file: File): Promise<string> => {
     try {
@@ -208,7 +213,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
     <div className="flex h-full w-full flex-col overflow-hidden">
       <div className="relative flex items-center justify-between pb-4">
         <div className="w-10"></div>
-        <h1 className="flex-1 text-center text-2xl font-bold">{note?.title || 'Untitled Note'}</h1>
+        <h1 className="flex-1 text-center text-2xl font-bold">{currentTitle || 'Untitled Note'}</h1>
         {isSaving && <div className="mr-4 text-sm text-muted-foreground">Saving...</div>}
         <div>
           <DropdownMenu>

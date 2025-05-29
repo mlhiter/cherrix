@@ -87,6 +87,19 @@ export default function NotePage() {
     }
   }, [noteId, fetchNote])
 
+  useEffect(() => {
+    const handleNoteUpdate = (event: CustomEvent) => {
+      if (event.detail.noteId === noteId) {
+        fetchNote()
+      }
+    }
+
+    window.addEventListener('note-updated' as any, handleNoteUpdate as any)
+    return () => {
+      window.removeEventListener('note-updated' as any, handleNoteUpdate as any)
+    }
+  }, [noteId, fetchNote])
+
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center">
