@@ -216,3 +216,7 @@ body {
   color: #0969da;
   cursor: pointer;
 }
+
+.bn-block-content[data-content-type='codeBlock'] {
+  background-color: #f7f6f3 !important;
+}

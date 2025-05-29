@@ -1,14 +1,18 @@
 'use client'
 
 import Image from 'next/image'
+import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { EllipsisVerticalIcon, FileUp, FileDown, History, Code } from 'lucide-react'
+
+import { codeBlock } from '@blocknote/code-block'
 import { BlockNoteView } from '@blocknote/mantine'
 import { useCreateBlockNote } from '@blocknote/react'
 import { BlockNoteEditor, PartialBlock } from '@blocknote/core'
-import { EllipsisVerticalIcon, FileUp, FileDown, History, Code } from 'lucide-react'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+
 import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import {
   Dialog,
   DialogContent,
@@ -17,12 +21,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { toast } from 'sonner'
 
 import '@blocknote/mantine/style.css'
 import '@blocknote/core/fonts/inter.css'
-import { VersionHistoryDialog } from './version-history-dialog'
 import { useCodeStore } from '@/stores/code'
+import { VersionHistoryDialog } from './version-history-dialog'
 
 interface Note {
   id: string
@@ -87,6 +90,7 @@ export default function Editor({ note, collaborators, isSaving, onSaveAction: on
           },
         ] as PartialBlock[]),
     uploadFile: handleFileUpload,
+    codeBlock: codeBlock,
   }) as BlockNoteEditor
 
   const exportToMarkdown = async () => {
