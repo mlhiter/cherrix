@@ -120,7 +120,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div className="flex h-full flex-col gap-4 pt-4">
       <Header title="Chat" />
       <div className="flex flex-1 flex-col gap-4">
         <div className="flex justify-end">

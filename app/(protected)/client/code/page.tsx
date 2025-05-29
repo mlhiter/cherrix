@@ -1,22 +1,21 @@
 'use client'
 
-import { Loader } from 'lucide-react'
+import { Loader, Download } from 'lucide-react'
+import { FileSystemTree } from '@webcontainer/api'
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { useSidebarContext } from '../context/sidebar-context'
-import { PreviewProvider, usePreviewContext } from '../context/preview-context'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 import { Preview } from './components/preview'
 import { Terminal } from './components/terminal'
 import { FileExplorer } from './components/file-explorer'
+import { useSidebarContext } from '../context/sidebar-context'
 import { CodeEditor, EditorRef } from './components/code-editor'
+import { PreviewProvider, usePreviewContext } from '../context/preview-context'
+import { Button } from '@/components/ui/button'
 
 import { initialFiles } from '@/constants/code'
 import { getWebContainerInstance } from '@/lib/webcontainer'
 import { useWebContainerStore } from '@/stores/web-container'
-import { useCodeStore } from '@/stores/code'
-import { FileSystemTree } from '@webcontainer/api'
 
 function ResizeHandle({ className = '', ...props }: { className?: string; [key: string]: any }) {
   return (
@@ -39,16 +38,15 @@ function VerticalResizeHandle({ className = '', ...props }: { className?: string
 }
 
 function CodePageContent() {
-  const searchParams = useSearchParams()
   const editorRef = useRef<EditorRef>(null)
   const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState(false)
   const [iframeUrl, setIframeUrl] = useState<string>('')
   const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed } = useSidebarContext()
   const { collapsed: previewCollapsed, setCollapsed: setPreviewCollapsed } = usePreviewContext()
   const initialLoadRef = useRef(true)
   const previewPanelRef = useRef<any>(null)
   const [animating, setAnimating] = useState(false)
-  const { files, setFiles } = useCodeStore()
 
   const { instance, setInstance, setStatus } = useWebContainerStore()
 
@@ -119,6 +117,30 @@ function CodePageContent() {
     }
   }, [previewCollapsed])
 
+  const handleExport = async () => {
+    if (!instance) return
+
+    try {
+      setExporting(true)
+      const data = await instance.export('.', { format: 'zip' })
+      const zip = new Blob([data], { type: 'application/zip' })
+
+      // Create download link
+      const url = window.URL.createObjectURL(zip)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'code-export.zip'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Export failed:', error)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -128,7 +150,20 @@ function CodePageContent() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div className="flex h-full flex-col">
+      {/* Toolbar */}
+      <div className="sticky top-0 z-10 flex items-center justify-between bg-white/80 py-2">
+        <div className="select-none text-lg font-semibold text-gray-700">Code Workspace</div>
+        <Button
+          onClick={handleExport}
+          disabled={exporting || !instance}
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 rounded-full border-gray-300 px-4 py-2 text-sm font-medium shadow-sm transition-all hover:bg-gray-100">
+          <Download className="h-4 w-4" />
+          {exporting ? 'Exporting...' : 'Export Code'}
+        </Button>
+      </div>
       <PanelGroup direction="horizontal" className="flex-1">
         {/* File Explorer */}
         <Panel defaultSize={20} minSize={10} className="rounded-lg border border-gray-200">

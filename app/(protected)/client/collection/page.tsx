@@ -167,7 +167,7 @@ export default function CollectionPage() {
   }, [])
 
   return (
-    <div className="flex h-full flex-col gap-6">
+    <div className="flex h-full flex-col gap-6 pt-4">
       <Header
         title="Collection"
         description="Collect and sync content from different sources, including official documents, RSS blogs, and Github repositories."

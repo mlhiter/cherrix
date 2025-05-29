@@ -113,7 +113,7 @@ export default function NotePage() {
   }
 
   return (
-    <div className="h-full flex-1 overflow-hidden">
+    <div className="h-full flex-1 overflow-hidden pt-4">
       <Editor note={note} collaborators={collaborators} isSaving={isSaving} onSaveAction={saveNote} />
     </div>
   )

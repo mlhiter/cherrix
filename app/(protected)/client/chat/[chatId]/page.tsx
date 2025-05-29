@@ -112,7 +112,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
+    <div className="flex h-full flex-col gap-4 pt-4">
       <Header title={chat.title} />
       <div className="flex h-[calc(100vh-190px)] flex-col">
         <Card className="relative flex-1 overflow-hidden">

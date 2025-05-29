@@ -72,7 +72,7 @@ export default function DocumentPage() {
   }, [])
 
   return (
-    <div className="flex h-full flex-col gap-6">
+    <div className="flex h-full flex-col gap-6 pt-4">
       <Header
         title="Document"
         description="Documents are static files that you collect manually and are not automatically updated. "

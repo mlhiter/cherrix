@@ -30,7 +30,11 @@ export const Sidebar = () => {
   }, [pathname, collapsed, setCollapsed])
 
   return (
-    <div className={cn('flex flex-col gap-y-4 transition-all duration-300 ease-in-out', collapsed ? 'w-12' : 'w-64')}>
+    <div
+      className={cn(
+        'ml-4 mt-4 flex flex-col gap-y-4 transition-all duration-300 ease-in-out',
+        collapsed ? 'w-12' : 'w-64'
+      )}>
       {isCodePage && (
         <div className="flex justify-end">
           <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="h-10 w-12">
