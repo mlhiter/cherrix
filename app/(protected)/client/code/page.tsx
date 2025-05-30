@@ -12,6 +12,7 @@ import { useSidebarContext } from '../context/sidebar-context'
 import { CodeEditor, EditorRef } from './components/code-editor'
 import { PreviewProvider, usePreviewContext } from '../context/preview-context'
 import { Button } from '@/components/ui/button'
+import { useFileSystemStore } from '@/stores/file-system'
 
 import { initialFiles } from '@/constants/code'
 import { getWebContainerInstance } from '@/lib/webcontainer'
@@ -47,6 +48,7 @@ function CodePageContent() {
   const initialLoadRef = useRef(true)
   const previewPanelRef = useRef<any>(null)
   const [animating, setAnimating] = useState(false)
+  const { currentFile } = useFileSystemStore()
 
   const { instance, setInstance, setStatus } = useWebContainerStore()
 
@@ -172,6 +174,7 @@ function CodePageContent() {
             onFileSelectAction={(path) => {
               editorRef.current?.loadFile(path)
             }}
+            currentFilePath={currentFile}
           />
         </Panel>
 
